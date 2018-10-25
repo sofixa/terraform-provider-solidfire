@@ -68,10 +68,10 @@ func (c *Client) init() {
 	}
 	c.requestSlots = make(chan int, c.MaxConcurrentRequests)
 	c.jsonrpcClient = &jsonrpc.Client{
-		Host:          c.Host,
-		Username:      c.Username,
-		Password:      c.Password,
-		HTTPTransport: c.HTTPTransport,
+		Host:     c.Host,
+		Username: c.Username,
+		Password: c.Password,
+		//		HTTPTransport: c.HTTPTransport,
 	}
 }
 
