@@ -17,19 +17,28 @@ type ListVolumesResult struct {
 	Volumes []Volume `json:"volumes"`
 }
 
+type QualityOfService struct {
+	MinIOPS   int `structs:"minIOPS"`
+	MaxIOPS   int `structs:"maxIOPS"`
+	BurstIOPS int `structs:"burstIOPS"`
+}
+
 type Volume struct {
-	Name               string `json:"name"`
-	VolumeID           int    `json:"volumeID"`
-	Iqn                string `json:"iqn"`
-	Access             string `json:"access"`
-	AccountID          int    `json:"accountID"`
-	BlockSize          int    `json:"blockSize"`
-	Enable512e         bool   `json:"enable512e"`
-	ScsiEUIDeviceID    string `json:"scsiEUIDeviceID"`
-	ScsiNAADeviceID    string `json:"ScsiNAADeviceID"`
-	Status             string `json:"status"`
-	VirtualVolumeID    int    `json:"virtualVolumeID"`
-	VolumeAccessGroups []int  `json:"volumeAccessGroups"`
+	Name               string           `json:"name"`
+	VolumeID           int              `json:"volumeID"`
+	Iqn                string           `json:"iqn"`
+	Access             string           `json:"access"`
+	AccountID          int              `json:"accountID"`
+	Attributes         interface{}      `structs:"attributes"`
+	BlockSize          int              `json:"blockSize"`
+	Enable512e         bool             `json:"enable512e"`
+	QOS                QualityOfService `structs:"qos"`
+	ScsiEUIDeviceID    string           `json:"scsiEUIDeviceID"`
+	ScsiNAADeviceID    string           `json:"ScsiNAADeviceID"`
+	Status             string           `json:"status"`
+	TotalSize          int              `structs:"totalSize"`
+	VirtualVolumeID    int              `json:"virtualVolumeID"`
+	VolumeAccessGroups []int            `json:"volumeAccessGroups"`
 }
 
 func (c *Client) GetVolumeByID(id string) (Volume, error) {
