@@ -13,7 +13,7 @@
 #
 # The essentials. None of the tests will run if you don't have these.
 export SOLIDFIRE_SERVER   ?= solidfire.cluster
-export SOLIDFIRE_USER     ?= user@solidfire.net
+export SOLIDFIRE_USERNAME ?= user@solidfire.net
 export SOLIDFIRE_PASSWORD ?= changeme
-
+export SOLIDFIRE_API_VERSION ?= 10.1
 # vi: filetype=make
