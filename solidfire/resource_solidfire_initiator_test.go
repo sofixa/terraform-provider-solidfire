@@ -158,7 +158,7 @@ const testAccCheckSolidFireInitiatorConfig = `
 resource "solidfire_initiator" "terraform-acceptance-test-1" {
 	name = "%s"
 	alias = "%s"
-	volumeAccessGroupID = "${solidfire_volume_access_group.terraform-acceptance-test-1.id}"
+	volume_access_group_id = "${solidfire_volume_access_group.terraform-acceptance-test-1.id}"
 }
 
 resource "solidfire_volume_access_group" "terraform-acceptance-test-1" {
@@ -170,7 +170,7 @@ const testAccCheckSolidFireInitiatorConfigUpdate = `
 resource "solidfire_initiator" "terraform-acceptance-test-1" {
 	name = "%s"
 	alias = "%s"
-	volumeAccessGroupID = "${solidfire_volume_access_group.terraform-acceptance-test-2.id}"
+	volume_access_group_id = "${solidfire_volume_access_group.terraform-acceptance-test-2.id}"
 }
 
 resource "solidfire_volume_access_group" "terraform-acceptance-test-2" {

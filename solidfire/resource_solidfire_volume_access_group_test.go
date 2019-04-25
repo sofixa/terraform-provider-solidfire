@@ -152,12 +152,12 @@ resource "solidfire_volume_access_group" "terraform-acceptance-test-1" {
 }
 resource "solidfire_volume" "terraform-acceptance-test-1" {
 	name = "Terraform-Acceptance-Volume-1"
-	accountID = "${solidfire_account.terraform-acceptance-test-1.id}"
-	totalSize = "1000000000"
+	account_id = "${solidfire_account.terraform-acceptance-test-1.id}"
+	total_size = "1000000000"
 	enable512e = "true"
-	minIOPS = "600"
-	maxIOPS = "8000"
-	burstIOPS = "8000"
+	min_iops = "600"
+	max_iops = "8000"
+	burst_iops = "8000"
 }
 resource "solidfire_account" "terraform-acceptance-test-1" {
 	username = "terraform-acceptance-test-vag"
@@ -171,21 +171,21 @@ resource "solidfire_volume_access_group" "terraform-acceptance-test-1" {
 }
 resource "solidfire_volume" "terraform-acceptance-test-1" {
 	name = "Terraform-Acceptance-Volume-1"
-	accountID = "${solidfire_account.terraform-acceptance-test-1.id}"
-	totalSize = "1000000000"
+	account_id = "${solidfire_account.terraform-acceptance-test-1.id}"
+	total_size = "1000000000"
 	enable512e = "true"
-	minIOPS = "600"
-	maxIOPS = "8000"
-	burstIOPS = "8000"
+	min_iops = "600"
+	max_iops = "8000"
+	burst_iops = "8000"
 }
 resource "solidfire_volume" "terraform-acceptance-test-2" {
 	name = "Terraform-Acceptance-Volume-2"
-	accountID = "${solidfire_account.terraform-acceptance-test-1.id}"
-	totalSize = "1000000000"
+	account_id = "${solidfire_account.terraform-acceptance-test-1.id}"
+	total_size = "1000000000"
 	enable512e = "true"
-	minIOPS = "600"
-	maxIOPS = "8000"
-	burstIOPS = "8000"
+	min_iops = "600"
+	max_iops = "8000"
+	burst_iops = "8000"
 }
 resource "solidfire_account" "terraform-acceptance-test-1" {
 	username = "terraform-acceptance-test-vag"

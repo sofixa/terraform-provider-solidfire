@@ -31,11 +31,11 @@ func TestVolume_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSolidFireVolumeExists("solidfire_volume.terraform-acceptance-test-1", &volume),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "name", "terraform-acceptance-test"),
-					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "totalSize", "1000000000"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "total_size", "1000000000"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "enable512e", "true"),
-					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "minIOPS", "500"),
-					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "maxIOPS", "10000"),
-					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "burstIOPS", "10000"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "min_iops", "500"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "max_iops", "10000"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "burst_iops", "10000"),
 				),
 			},
 		},
@@ -95,12 +95,12 @@ func testAccCheckSolidFireVolumeExists(n string, volume *element.Volume) resourc
 const testAccCheckSolidFireVolumeConfig = `
 resource "solidfire_volume" "terraform-acceptance-test-1" {
 	name = "%s"
-	accountID = "${solidfire_account.terraform-acceptance-test-1.id}"
-	totalSize = "%s"
+	account_id = "${solidfire_account.terraform-acceptance-test-1.id}"
+	total_size = "%s"
 	enable512e = "%s"
-	minIOPS = "%s"
-	maxIOPS = "%s"
-	burstIOPS = "%s"
+	min_iops = "%s"
+	max_iops = "%s"
+	burst_iops = "%s"
 }
 resource "solidfire_account" "terraform-acceptance-test-1" {
 	username = "terraform-acceptance-test-volume"
