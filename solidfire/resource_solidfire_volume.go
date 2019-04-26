@@ -265,6 +265,29 @@ func resourceSolidFireVolumeUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 	volume.VolumeID = convID
 
+	if v, ok := d.GetOk("account_id"); ok {
+		volume.AccountID = v.(int)
+	} else {
+		return fmt.Errorf("account_id argument is required")
+	}
+
+	if v, ok := d.GetOk("total_size"); ok {
+		volume.TotalSize = v.(int)
+	} else {
+		return fmt.Errorf("total_size argument is required")
+	}
+
+	if v, ok := d.GetOk("min_iops"); ok {
+		volume.QOS.MinIOPS = v.(int)
+	}
+
+	if v, ok := d.GetOk("max_iops"); ok {
+		volume.QOS.MaxIOPS = v.(int)
+	}
+
+	if v, ok := d.GetOk("burst_iops"); ok {
+		volume.QOS.BurstIOPS = v.(int)
+	}
 	err := updateVolume(client, volume)
 	if err != nil {
 		return err
