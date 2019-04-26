@@ -13,6 +13,11 @@ type ListVolumesRequest struct {
 	IncludeVirtualVolumes bool  `structs:"includeVirtualVolumes"`
 }
 
+type ListVolumesByAccountsRequest struct {
+	Accounts              []int `structs:"volumeIDs"`
+	IncludeVirtualVolumes bool  `structs:"includeVirtualVolumes"`
+}
+
 type ListVolumesResult struct {
 	Volumes []Volume `json:"volumes"`
 }
@@ -50,23 +55,56 @@ func (c *Client) GetVolumeByID(id string) (Volume, error) {
 	volIDs := make([]int, 1)
 	volIDs[0] = convID
 
-	params := structs.Map(ListVolumesRequest{Volumes: volIDs})
+	volumes, err := c.getVolumes(structs.Map(ListVolumesRequest{Volumes: volIDs}))
+	if err != nil {
+		return Volume{}, err
+	}
 
+	if len(volumes) != 1 {
+		return Volume{}, errors.New(fmt.Sprintf("Expected one Volume to be found. Response contained %v results", len(volumes)))
+	}
+
+	return volumes[0], nil
+
+}
+
+func (c *Client) getVolumes(params map[string]interface{}) ([]Volume, error) {
 	response, err := c.CallAPIMethod("ListVolumes", params)
 	if err != nil {
 		log.Print("ListVolumes request failed")
-		return Volume{}, err
+		return []Volume{}, err
 	}
 
 	var result ListVolumesResult
 	if err := json.Unmarshal([]byte(*response), &result); err != nil {
 		log.Print("Failed to unmarshal response from ListVolumes")
-		return Volume{}, err
+		return []Volume{}, err
+	}
+	return result.Volumes, nil
+}
+
+func (c *Client) GetVolumeByAccount(id string) ([]Volume, error) {
+	convID, err := strconv.Atoi(id)
+	if err != nil {
+		return []Volume{}, err
 	}
 
-	if len(result.Volumes) != 1 {
-		return Volume{}, errors.New(fmt.Sprintf("Expected one Volume to be found. Response contained %v results", len(result.Volumes)))
+	accountIDs := make([]int, 1)
+	accountIDs[0] = convID
+
+	params := structs.Map(ListVolumesByAccountsRequest{Accounts: accountIDs})
+
+	response, err := c.CallAPIMethod("ListVolumes", params)
+	if err != nil {
+		log.Print("ListVolumes request failed")
+		return []Volume{}, err
 	}
 
-	return result.Volumes[0], nil
+	var result ListVolumesResult
+	if err := json.Unmarshal([]byte(*response), &result); err != nil {
+		log.Print("Failed to unmarshal response from ListVolumes")
+		return []Volume{}, err
+	}
+
+	return result.Volumes, nil
 }
