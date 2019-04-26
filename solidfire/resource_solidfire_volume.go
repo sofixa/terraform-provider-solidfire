@@ -9,8 +9,8 @@ import (
 
 	"github.com/fatih/structs"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/solidfire/terraform-provider-solidfire/solidfire/element"
-	"github.com/solidfire/terraform-provider-solidfire/solidfire/element/jsonrpc"
+	"github.com/sofixa/terraform-provider-solidfire/solidfire/element"
+	"github.com/sofixa/terraform-provider-solidfire/solidfire/element/jsonrpc"
 )
 
 type CreateVolumeRequest struct {
@@ -61,13 +61,32 @@ func resourceSolidFireVolume() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"volume_id": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"iqn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"access": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"account_id": {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"total_size": {
+			"attributes": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"block_size": {
 				Type:     schema.TypeInt,
-				Required: true,
+				Computed: true,
 			},
 			"enable512e": {
 				Type:     schema.TypeBool,
@@ -85,16 +104,25 @@ func resourceSolidFireVolume() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"attributes": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-			},
-			"iqn": {
+			"scsi_eui_device_id": {
 				Type:     schema.TypeString,
 				Computed: true,
+			},
+			"scsi_naa_device_id": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"status": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"virtual_volume_id": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"total_size": {
+				Type:     schema.TypeInt,
+				Required: true,
 			},
 		},
 	}
@@ -184,7 +212,23 @@ func resourceSolidFireVolumeRead(d *schema.ResourceData, meta interface{}) error
 	}
 
 	d.Set("name", volume.Name)
+	d.Set("volume_id", volume.VolumeID)
+	d.Set("iqn", volume.Iqn)
+	d.Set("access", volume.Access)
+	d.Set("account_id", volume.AccountID)
+	d.Set("attributes", volume.Attributes)
+	d.Set("block_size", volume.BlockSize)
+	d.Set("enable512e", volume.Enable512e)
+	d.Set("min_iops", volume.QOS.MinIOPS)
+	d.Set("max_iops", volume.QOS.MaxIOPS)
+	d.Set("burst_iops", volume.QOS.BurstIOPS)
+	d.Set("scsi_eui_device_id", volume.ScsiEUIDeviceID)
+	d.Set("scsi_naa_device_id", volume.ScsiNAADeviceID)
+	d.Set("status", volume.Status)
+	d.Set("total_size", volume.TotalSize)
+	d.Set("virtual_volumeID", volume.VirtualVolumeID)
 
+	log.Printf("[DEBUG] %s: Read complete", volume.Name)
 	return nil
 
 }
