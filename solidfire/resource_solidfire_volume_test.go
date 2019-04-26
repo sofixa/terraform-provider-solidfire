@@ -1,12 +1,12 @@
 package solidfire
 
 import (
-	"strconv"
-	"testing"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sofixa/terraform-provider-solidfire/solidfire/element"
+	"strconv"
+	"testing"
 )
 
 func TestVolume_basic(t *testing.T) {
