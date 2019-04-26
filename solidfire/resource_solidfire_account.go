@@ -141,9 +141,9 @@ func resourceSolidFireAccountRead(d *schema.ResourceData, meta interface{}) erro
 		log.Print("GetAccountByID failed")
 		return err
 	}
-		d.Set("username", res.Username)
-		d.Set("initiator_secret", res.InitiatorSecret)
-		d.Set("target_secret", res.TargetSecret)
+	d.Set("username", res.Username)
+	d.Set("initiator_secret", res.InitiatorSecret)
+	d.Set("target_secret", res.TargetSecret)
 
 	return nil
 }

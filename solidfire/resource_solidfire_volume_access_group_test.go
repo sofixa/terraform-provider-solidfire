@@ -114,14 +114,13 @@ func TestVolumeAccessGroup_update(t *testing.T) {
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-2", "max_iops", "8000"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-2", "burst_iops", "8000"),
 					resource.TestCheckResourceAttr("solidfire_account.terraform-acceptance-test-1", "username", "terraform-acceptance-test-vag"),
-
 				),
 			},
 		},
 	})
 }
 
- /*func TestVolumeAccessGroup_removeVolumes(t *testing.T) {
+/*func TestVolumeAccessGroup_removeVolumes(t *testing.T) {
  	var volumeAccessGroup element.VolumeAccessGroup
  	resource.Test(t, resource.TestCase{
  		PreCheck:     func() { testAccPreCheck(t) },
