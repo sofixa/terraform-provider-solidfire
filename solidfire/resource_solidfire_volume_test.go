@@ -22,7 +22,7 @@ func TestVolume_basic(t *testing.T) {
 				Config: fmt.Sprintf(
 					testAccCheckSolidFireVolumeConfig,
 					"terraform-acceptance-test",
-					"1000000000",
+					"1073741825",
 					"true",
 					"500",
 					"10000",
@@ -31,7 +31,7 @@ func TestVolume_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSolidFireVolumeExists("solidfire_volume.terraform-acceptance-test-1", &volume),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "name", "terraform-acceptance-test"),
-					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "total_size", "1000000000"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "total_size", "1073741825"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "enable512e", "true"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "min_iops", "500"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "max_iops", "10000"),
