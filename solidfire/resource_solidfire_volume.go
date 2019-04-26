@@ -208,7 +208,7 @@ func listVolumes(client *element.Client, request element.ListVolumesRequest) (el
 }
 
 func resourceSolidFireVolumeUpdate(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Updating volume access group %#v", d)
+	log.Printf("Updating volume %#v", d)
 	client := meta.(*element.Client)
 
 	volume := ModifyVolumeRequest{}
@@ -242,7 +242,7 @@ func updateVolume(client *element.Client, request ModifyVolumeRequest) error {
 }
 
 func resourceSolidFireVolumeDelete(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Deleting volume access group: %#v", d)
+	log.Printf("Deleting volume: %#v", d)
 	client := meta.(*element.Client)
 
 	volume := DeleteVolumeRequest{}
