@@ -35,6 +35,7 @@ website/node_modules
 examples/**/*.tfvars
 
 website/vendor
+terraform-provider-solidfire
 
 # Test exclusions
 !command/test-fixtures/**/*.tfstate
