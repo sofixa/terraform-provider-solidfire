@@ -178,31 +178,15 @@ func resourceSolidFireVolumeRead(d *schema.ResourceData, meta interface{}) error
 	log.Printf("Reading volume: %#v", d)
 	client := meta.(*element.Client)
 
-	volumes := element.ListVolumesRequest{}
-
-	id := d.Id()
-	s := make([]int, 1)
-	convID, convErr := strconv.Atoi(id)
-
-	if convErr != nil {
-		return fmt.Errorf("id argument is required")
-	}
-
-	s[0] = convID
-	volumes.Volumes = s
-
-	res, err := listVolumes(client, volumes)
+	volume, err := client.GetVolumeByID(d.Id())
 	if err != nil {
 		return err
 	}
 
-	if len(res.Volumes) != 1 {
-		return fmt.Errorf("Expected one Volume to be found. Response contained %v results", len(res.Volumes))
-	}
-
-	d.Set("name", res.Volumes[0].Name)
+	d.Set("name", volume.Name)
 
 	return nil
+
 }
 
 func listVolumes(client *element.Client, request element.ListVolumesRequest) (element.ListVolumesResult, error) {
