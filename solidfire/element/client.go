@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/sirupsen/logrus"
-	"github.com/solidfire/terraform-provider-solidfire/solidfire/element/jsonrpc"
+	"github.com/sofixa/terraform-provider-solidfire/solidfire/element/jsonrpc"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 )
 

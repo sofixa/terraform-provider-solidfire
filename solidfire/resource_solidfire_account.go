@@ -9,8 +9,8 @@ import (
 
 	"github.com/fatih/structs"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/solidfire/terraform-provider-solidfire/solidfire/element"
-	"github.com/solidfire/terraform-provider-solidfire/solidfire/element/jsonrpc"
+	"github.com/sofixa/terraform-provider-solidfire/solidfire/element"
+	"github.com/sofixa/terraform-provider-solidfire/solidfire/element/jsonrpc"
 )
 
 type CreateAccountRequest struct {

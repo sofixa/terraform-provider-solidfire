@@ -8,7 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/solidfire/terraform-provider-solidfire/solidfire/element"
+	"github.com/sofixa/terraform-provider-solidfire/solidfire/element"
 )
 
 func TestVolume_basic(t *testing.T) {
