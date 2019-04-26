@@ -85,6 +85,8 @@ func TestAccount_update(t *testing.T) {
 				Config: fmt.Sprintf(
 					testAccCheckSolidFireAccountConfigUpdate,
 					"terraform-acceptance-test-update",
+					"ABC123456XYZU",
+					"SecretSecret1U",
 				),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSolidFireAccountExists("solidfire_account.terraform-acceptance-account-1", &account),
@@ -169,5 +171,7 @@ resource "solidfire_account" "terraform-acceptance-account-1" {
 const testAccCheckSolidFireAccountConfigUpdate = `
 resource "solidfire_account" "terraform-acceptance-account-1" {
 	username = "%s"
+	target_secret = "%s"
+	initiator_secret = "%s"
 }
 `
