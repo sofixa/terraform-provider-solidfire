@@ -129,7 +129,7 @@ func resourceSolidFireVolume() *schema.Resource {
 }
 
 func resourceSolidFireVolumeCreate(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[DEBUG] [DEBUG] Creating volume: %#v", d)
+	log.Printf("[DEBUG] Creating volume: %#v", d)
 	client := meta.(*element.Client)
 
 	volume := CreateVolumeRequest{}
@@ -178,7 +178,7 @@ func resourceSolidFireVolumeCreate(d *schema.ResourceData, meta interface{}) err
 
 	d.SetId(fmt.Sprintf("%v", resp.VolumeID))
 	d.Set("iqn", resp.Volume.Iqn)
-	log.Printf("[DEBUG] [DEBUG] Created volume: %v %v", volume.Name, resp.VolumeID)
+	log.Printf("[DEBUG] Created volume: %v %v", volume.Name, resp.VolumeID)
 
 	return resourceSolidFireVolumeRead(d, meta)
 }
@@ -186,7 +186,7 @@ func resourceSolidFireVolumeCreate(d *schema.ResourceData, meta interface{}) err
 func createVolume(client *element.Client, request CreateVolumeRequest) (CreateVolumeResult, error) {
 	params := structs.Map(request)
 
-	log.Printf("[DEBUG] [DEBUG] Parameters: %v", params)
+	log.Printf("[DEBUG] Parameters: %v", params)
 
 	response, err := client.CallAPIMethod("CreateVolume", params)
 	if err != nil {
@@ -203,7 +203,7 @@ func createVolume(client *element.Client, request CreateVolumeRequest) (CreateVo
 }
 
 func resourceSolidFireVolumeRead(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[DEBUG] [DEBUG] Reading volume: %#v", d)
+	log.Printf("[DEBUG] Reading volume: %#v", d)
 	client := meta.(*element.Client)
 
 	volume, err := client.GetVolumeByID(d.Id())
@@ -228,7 +228,7 @@ func resourceSolidFireVolumeRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("total_size", volume.TotalSize)
 	d.Set("virtual_volumeID", volume.VirtualVolumeID)
 
-	log.Printf("[DEBUG] [DEBUG] [DEBUG] %s: Read complete", volume.Name)
+	log.Printf("[DEBUG] [DEBUG] %s: Read complete", volume.Name)
 	return nil
 
 }
@@ -252,7 +252,7 @@ func listVolumes(client *element.Client, request element.ListVolumesRequest) (el
 }
 
 func resourceSolidFireVolumeUpdate(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[DEBUG] [DEBUG] Updating volume %#v", d)
+	log.Printf("[DEBUG] Updating volume %#v", d)
 	client := meta.(*element.Client)
 
 	volume := ModifyVolumeRequest{}
@@ -309,7 +309,7 @@ func updateVolume(client *element.Client, request ModifyVolumeRequest) error {
 }
 
 func resourceSolidFireVolumeDelete(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[DEBUG] [DEBUG] Deleting volume: %#v", d)
+	log.Printf("[DEBUG] Deleting volume: %#v", d)
 	client := meta.(*element.Client)
 
 	volume := DeleteVolumeRequest{}
@@ -360,7 +360,7 @@ func purgeDeletedVolume(client *element.Client, request DeleteVolumeRequest) err
 }
 
 func resourceSolidFireVolumeExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	log.Printf("[DEBUG] [DEBUG] Checking existence of volume: %#v", d)
+	log.Printf("[DEBUG] Checking existence of volume: %#v", d)
 	client := meta.(*element.Client)
 
 	volumes := element.ListVolumesRequest{}
