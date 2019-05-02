@@ -74,7 +74,7 @@ func resourceSolidFireAccount() *schema.Resource {
 }
 
 func resourceSolidFireAccountCreate(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Creating account: %#v", d)
+	log.Printf("[DEBUG] Creating account: %#v", d)
 	client := meta.(*element.Client)
 
 	acct := CreateAccountRequest{}
@@ -101,7 +101,7 @@ func resourceSolidFireAccountCreate(d *schema.ResourceData, meta interface{}) er
 
 	d.SetId(fmt.Sprintf("%v", resp.Account.AccountID))
 
-	log.Printf("Created account: %v %v", acct.Username, resp.Account.AccountID)
+	log.Printf("[DEBUG] Created account: %v %v", acct.Username, resp.Account.AccountID)
 
 	return resourceSolidFireAccountRead(d, meta)
 }
@@ -109,7 +109,7 @@ func resourceSolidFireAccountCreate(d *schema.ResourceData, meta interface{}) er
 func createAccount(client *element.Client, request CreateAccountRequest) (CreateAccountResult, error) {
 	params := structs.Map(request)
 
-	log.Printf("Parameters: %v", params)
+	log.Printf("[DEBUG] Parameters: %v", params)
 
 	response, err := client.CallAPIMethod("AddAccount", params)
 	if err != nil {
@@ -126,7 +126,7 @@ func createAccount(client *element.Client, request CreateAccountRequest) (Create
 }
 
 func resourceSolidFireAccountRead(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Reading account: %#v", d)
+	log.Printf("[DEBUG] Reading account: %#v", d)
 	client := meta.(*element.Client)
 
 	id := d.Id()
@@ -149,7 +149,7 @@ func resourceSolidFireAccountRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSolidFireAccountUpdate(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Updating account %#v", d)
+	log.Printf("[DEBUG] Updating account %#v", d)
 	client := meta.(*element.Client)
 
 	acct := ModifyAccountRequest{}
@@ -195,7 +195,7 @@ func modifyAccount(client *element.Client, request ModifyAccountRequest) error {
 }
 
 func resourceSolidFireAccountDelete(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Deleting account: %#v", d)
+	log.Printf("[DEBUG] Deleting account: %#v", d)
 	client := meta.(*element.Client)
 
 	acct := RemoveAccountRequest{}
@@ -229,7 +229,7 @@ func removeAccount(client *element.Client, request RemoveAccountRequest) error {
 }
 
 func resourceSolidFireAccountExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	log.Printf("Checking existence of account: %#v", d)
+	log.Printf("[DEBUG] Checking existence of account: %#v", d)
 	client := meta.(*element.Client)
 
 	id := d.Id()

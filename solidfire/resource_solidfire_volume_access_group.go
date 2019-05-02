@@ -83,7 +83,7 @@ func resourceSolidFireVolumeAccessGroup() *schema.Resource {
 }
 
 func resourceSolidFireVolumeAccessGroupCreate(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Creating volume access group: %#v", d)
+	log.Printf("[DEBUG] Creating volume access group: %#v", d)
 	client := meta.(*element.Client)
 
 	vag := CreateVolumeAccessGroupRequest{}
@@ -107,7 +107,7 @@ func resourceSolidFireVolumeAccessGroupCreate(d *schema.ResourceData, meta inter
 	}
 
 	d.SetId(fmt.Sprintf("%v", resp.VolumeAccessGroupID))
-	log.Printf("Created volume access group: %v %v", vag.Name, resp.VolumeAccessGroupID)
+	log.Printf("[DEBUG] Created volume access group: %v %v", vag.Name, resp.VolumeAccessGroupID)
 
 	return resourceSolidFireVolumeAccessGroupRead(d, meta)
 }
@@ -115,7 +115,7 @@ func resourceSolidFireVolumeAccessGroupCreate(d *schema.ResourceData, meta inter
 func createVolumeAccessGroup(client *element.Client, request CreateVolumeAccessGroupRequest) (CreateVolumeAccessGroupResult, error) {
 	params := structs.Map(request)
 
-	log.Printf("Parameters: %v", params)
+	log.Printf("[DEBUG] Parameters: %v", params)
 
 	response, err := client.CallAPIMethod("CreateVolumeAccessGroup", params)
 	if err != nil {
@@ -132,7 +132,7 @@ func createVolumeAccessGroup(client *element.Client, request CreateVolumeAccessG
 }
 
 func resourceSolidFireVolumeAccessGroupRead(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Reading volume access group: %#v", d)
+	log.Printf("[DEBUG] Reading volume access group: %#v", d)
 	client := meta.(*element.Client)
 
 	vags := element.ListVolumeAccessGroupsRequest{}
@@ -187,7 +187,7 @@ func listVolumeAccessGroups(client *element.Client, request element.ListVolumeAc
 }
 
 func resourceSolidFireVolumeAccessGroupUpdate(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Updating volume access group %#v", d)
+	log.Printf("[DEBUG] Updating volume access group %#v", d)
 	client := meta.(*element.Client)
 
 	vag := ModifyVolumeAccessGroupRequest{}
@@ -236,7 +236,7 @@ func modifyVolumeAccessGroup(client *element.Client, request ModifyVolumeAccessG
 }
 
 func resourceSolidFireVolumeAccessGroupDelete(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Deleting volume access group: %#v", d)
+	log.Printf("[DEBUG] Deleting volume access group: %#v", d)
 	client := meta.(*element.Client)
 
 	vag := DeleteVolumeAccessGroupRequest{}
@@ -270,7 +270,7 @@ func deleteVolumeAccessGroup(client *element.Client, request DeleteVolumeAccessG
 }
 
 func resourceSolidFireVolumeAccessGroupExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	log.Printf("Checking existence of volume access group: %#v", d)
+	log.Printf("[DEBUG] Checking existence of volume access group: %#v", d)
 	client := meta.(*element.Client)
 
 	vags := element.ListVolumeAccessGroupsRequest{}

@@ -76,7 +76,7 @@ func resourceSolidFireInitiator() *schema.Resource {
 }
 
 func resourceSolidFireInitiatorCreate(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Creating initiator: %#v", d)
+	log.Printf("[DEBUG] Creating initiator: %#v", d)
 	client := meta.(*element.Client)
 
 	initiators := CreateInitiatorsRequest{}
@@ -115,7 +115,7 @@ func resourceSolidFireInitiatorCreate(d *schema.ResourceData, meta interface{}) 
 	}
 
 	d.SetId(fmt.Sprintf("%v", resp.Initiators[0].ID))
-	log.Printf("Created initiator: %v %v", newInitiator[0].Name, resp.Initiators[0].ID)
+	log.Printf("[DEBUG] Created initiator: %v %v", newInitiator[0].Name, resp.Initiators[0].ID)
 
 	return resourceSolidFireInitiatorRead(d, meta)
 }
@@ -123,7 +123,7 @@ func resourceSolidFireInitiatorCreate(d *schema.ResourceData, meta interface{}) 
 func createInitiators(client *element.Client, request CreateInitiatorsRequest) (CreateInitiatorsResult, error) {
 	params := structs.Map(request)
 
-	log.Printf("Parameters: %v", params)
+	log.Printf("[DEBUG] Parameters: %v", params)
 
 	response, err := client.CallAPIMethod("CreateInitiators", params)
 	if err != nil {
@@ -136,12 +136,12 @@ func createInitiators(client *element.Client, request CreateInitiatorsRequest) (
 		log.Print("Failed to unmarshall resposne from CreateInitiators")
 		return CreateInitiatorsResult{}, err
 	}
-	log.Printf("Initiator Result: %v", result)
+	log.Printf("[DEBUG] Initiator Result: %v", result)
 	return result, nil
 }
 
 func resourceSolidFireInitiatorRead(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Reading initiator: %#v", d)
+	log.Printf("[DEBUG] Reading initiator: %#v", d)
 	client := meta.(*element.Client)
 
 	initiators := element.ListInitiatorRequest{}
@@ -196,7 +196,7 @@ func listInitiators(client *element.Client, request element.ListInitiatorRequest
 }
 
 func resourceSolidFireInitiatorUpdate(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Updating initiator: %#v", d)
+	log.Printf("[DEBUG] Updating initiator: %#v", d)
 	client := meta.(*element.Client)
 
 	initiators := ModifyInitiatorsRequest{}
@@ -242,7 +242,7 @@ func modifyInitiators(client *element.Client, request ModifyInitiatorsRequest) e
 }
 
 func resourceSolidFireInitiatorDelete(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("Deleting initiator: %#v", d)
+	log.Printf("[DEBUG] Deleting initiator: %#v", d)
 	client := meta.(*element.Client)
 
 	initiators := DeleteInitiatorsRequest{}
@@ -279,7 +279,7 @@ func deleteInitiator(client *element.Client, request DeleteInitiatorsRequest) er
 }
 
 func resourceSolidFireInitiatorExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	log.Printf("Checking existence of initiator: %#v", d)
+	log.Printf("[DEBUG] Checking existence of initiator: %#v", d)
 	client := meta.(*element.Client)
 
 	initiators := element.ListInitiatorRequest{}
