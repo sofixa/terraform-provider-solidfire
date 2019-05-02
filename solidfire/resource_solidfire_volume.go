@@ -72,7 +72,7 @@ func resourceSolidFireVolume() *schema.Resource {
 			"access": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default: "readWrite"
+				Default:  "readWrite",
 			},
 			"account_id": {
 				Type:     schema.TypeInt,
