@@ -228,7 +228,7 @@ func resourceSolidFireVolumeRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("total_size", volume.TotalSize)
 	d.Set("virtual_volumeID", volume.VirtualVolumeID)
 
-	log.Printf("[DEBUG] [DEBUG] %s: Read complete", volume.Name)
+	log.Printf("[DEBUG] %s: Read complete", volume.Name)
 	return nil
 
 }
