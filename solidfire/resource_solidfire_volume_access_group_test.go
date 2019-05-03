@@ -31,6 +31,7 @@ func TestVolumeAccessGroup_basic(t *testing.T) {
 				),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSolidFireVolumeAccessGroupExists("solidfire_volume_access_group.terraform-acceptance-test-1", &volumeAccessGroup),
+					testAccCheckSolidFireVolumeAccessGroupAttributes(&volumeAccessGroup),
 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "name", "terraform-acceptance-test"),
 					resource.TestCheckResourceAttrSet("solidfire_volume_access_group.terraform-acceptance-test-1", "id"),
 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "volumes.#", "1"),
@@ -67,6 +68,7 @@ func TestVolumeAccessGroup_update(t *testing.T) {
 				),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSolidFireVolumeAccessGroupExists("solidfire_volume_access_group.terraform-acceptance-test-1", &volumeAccessGroup),
+					testAccCheckSolidFireVolumeAccessGroupAttributes(&volumeAccessGroup),
 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "name", "terraform-acceptance-test"),
 					resource.TestCheckResourceAttrSet("solidfire_volume_access_group.terraform-acceptance-test-1", "id"),
 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "volumes.#", "1"),
@@ -98,6 +100,7 @@ func TestVolumeAccessGroup_update(t *testing.T) {
 				),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSolidFireVolumeAccessGroupExists("solidfire_volume_access_group.terraform-acceptance-test-1", &volumeAccessGroup),
+					testAccCheckSolidFireVolumeAccessGroupAttributes(&volumeAccessGroup),
 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "name", "terraform-acceptance-test-update"),
 					resource.TestCheckResourceAttrSet("solidfire_volume_access_group.terraform-acceptance-test-1", "id"),
 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "volumes.#", "2"),
@@ -175,6 +178,42 @@ func testAccCheckSolidFireVolumeAccessGroupDestroy(s *terraform.State) error {
 
 	return nil
 }
+
+// Compare the actual attributes as present on the SolidFire cluster via the SolidFire API
+// to check there's no difference between the reality and TF's state
+func testAccCheckSolidFireVolumeAccessGroupAttributes(volumeAccessGroup *element.VolumeAccessGroup) resource.TestCheckFunc {
+    return func(s *terraform.State) error {
+
+		// Check all attributes are correct
+        if volumeAccessGroup.Name != "terraform-acceptance-test" {
+            return fmt.Errorf("volumeAccessGroup name is %s, was expecting %s", volumeAccessGroup.Name, "terraform-acceptance-test")
+        }		
+		// Check volumeAccessGroup's Volumes are all present
+		for _, rs := range s.RootModule().Resources {
+			if rs.Type == "solidfire_volume" {
+				// Convert to int
+				convID, err := strconv.Atoi(rs.Primary.ID)
+				if err != nil {
+					return err
+				}		
+				// placeholder variable
+				is_present := false 
+				// for earch volume on the VolumeAccessGroup, check if it's ID is the same as the volume IDs on the Terraform side
+				for _, volume := range volumeAccessGroup.Volumes {
+					if volume == convID {
+						is_present = true
+						break
+					}
+				}
+				if is_present == false {
+					return fmt.Errorf("Volume id %d not present in Volume Access Group %v", convID, volumeAccessGroup)
+				}
+			}
+		}	
+		return nil
+	}
+}
+
 
 func testAccCheckSolidFireVolumeAccessGroupExists(n string, volume *element.VolumeAccessGroup) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
