@@ -1,10 +1,10 @@
 package solidfire
 
 import (
+	"fmt"
+	"log"
 	"strconv"
 	"testing"
-
-	"fmt"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -194,6 +194,7 @@ func testAccCheckSolidFireVolumeAccessGroupAttributes(volumeAccessGroup *element
 		// Check volumeAccessGroup's Volumes are all present
 		for _, rs := range s.RootModule().Resources {
 			if rs.Type == "solidfire_volume" {
+				log.Printf("[DEBUG] Checking if volume id %s is in Volume Access Group %s", rs.Primary.ID, volumeAccessGroup.Name)
 				// Convert to int
 				convID, err := strconv.Atoi(rs.Primary.ID)
 				if err != nil {
@@ -203,6 +204,7 @@ func testAccCheckSolidFireVolumeAccessGroupAttributes(volumeAccessGroup *element
 				is_present := false
 				// for earch volume on the VolumeAccessGroup, check if it's ID is the same as the volume IDs on the Terraform side
 				for _, volume := range volumeAccessGroup.Volumes {
+					log.Printf("[DEBUG] Comparing volume id %d to volume from Volume Access Group %d", convID, volume)
 					if volume == convID {
 						is_present = true
 						break
@@ -216,6 +218,7 @@ func testAccCheckSolidFireVolumeAccessGroupAttributes(volumeAccessGroup *element
 				is_present := false
 				// for earch initiator on the VolumeAccessGroup, check if it's also on the Terraform side
 				for _, initiator := range volumeAccessGroup.Initiators {
+					log.Printf("[DEBUG] Comparing initiator %s to initiator from Volume Access Group %s", rs.Primary.Attributes["name"], initiator)
 					if initiator == rs.Primary.Attributes["name"] {
 						is_present = true
 						break
