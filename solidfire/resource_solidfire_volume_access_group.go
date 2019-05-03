@@ -33,12 +33,12 @@ type DeleteVolumeAccessGroupRequest struct {
 }
 
 type ModifyVolumeAccessGroupRequest struct {
-	VolumeAccessGroupID    int         `structs:"volumeAccessGroupID"`
-	Name                   string      `structs:"name"`
-	Attributes             interface{} `structs:"attributes"`
-	Initiators             []int       `structs:"initiators"`
-	DeleteOrphanInitiators bool        `structs:"deleteOrphanInitiators"`
-	Volumes                []int       `structs:"volumes"`
+	VolumeAccessGroupID int         `structs:"volumeAccessGroupID"`
+	Name                string      `structs:"name"`
+	Attributes          interface{} `structs:"attributes"`
+	//Initiators             []int       `structs:"initiators"`
+	DeleteOrphanInitiators bool  `structs:"deleteOrphanInitiators"`
+	Volumes                []int `structs:"volumes"`
 }
 
 func resourceSolidFireVolumeAccessGroup() *schema.Resource {
