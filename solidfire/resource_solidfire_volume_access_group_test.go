@@ -182,12 +182,12 @@ func testAccCheckSolidFireVolumeAccessGroupDestroy(s *terraform.State) error {
 // Compare the actual attributes as present on the SolidFire cluster via the SolidFire API
 // to check there's no difference between the reality and TF's state
 func testAccCheckSolidFireVolumeAccessGroupAttributes(volumeAccessGroup *element.VolumeAccessGroup, name string) resource.TestCheckFunc {
-    return func(s *terraform.State) error {
+	return func(s *terraform.State) error {
 
 		// Check all attributes are correct
-        if volumeAccessGroup.Name != name {
-            return fmt.Errorf("volumeAccessGroup name is %s, was expecting %s", volumeAccessGroup.Name, "terraform-acceptance-test or -update")
-        }		
+		if volumeAccessGroup.Name != name {
+			return fmt.Errorf("volumeAccessGroup name is %s, was expecting %s", volumeAccessGroup.Name, "terraform-acceptance-test or -update")
+		}
 		// Check volumeAccessGroup's Volumes are all present
 		for _, rs := range s.RootModule().Resources {
 			if rs.Type == "solidfire_volume" {
@@ -195,9 +195,9 @@ func testAccCheckSolidFireVolumeAccessGroupAttributes(volumeAccessGroup *element
 				convID, err := strconv.Atoi(rs.Primary.ID)
 				if err != nil {
 					return err
-				}		
+				}
 				// placeholder variable
-				is_present := false 
+				is_present := false
 				// for earch volume on the VolumeAccessGroup, check if it's ID is the same as the volume IDs on the Terraform side
 				for _, volume := range volumeAccessGroup.Volumes {
 					if volume == convID {
@@ -209,11 +209,10 @@ func testAccCheckSolidFireVolumeAccessGroupAttributes(volumeAccessGroup *element
 					return fmt.Errorf("Volume id %d not present in Volume Access Group %v", convID, volumeAccessGroup)
 				}
 			}
-		}	
+		}
 		return nil
 	}
 }
-
 
 func testAccCheckSolidFireVolumeAccessGroupExists(n string, volume *element.VolumeAccessGroup) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
