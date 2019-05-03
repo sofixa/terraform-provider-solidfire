@@ -14,8 +14,8 @@ import (
 )
 
 type CreateVolumeAccessGroupRequest struct {
-	Name       string      `structs:"name"`
-	Initiators []string    `structs:"initiators"`
+	Name string `structs:"name"`
+	//	Initiators []string    `structs:"initiators"`
 	Volumes    []int       `structs:"volumes"`
 	Attributes interface{} `structs:"attributes"`
 	ID         int         `structs:"id"`
