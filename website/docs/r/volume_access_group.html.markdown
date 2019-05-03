@@ -30,12 +30,11 @@ resource "solidfire_volume_access_group" "main-group" {
 The following arguments are supported:
 
 * `name` - (Required) The name of the SolidFire volume access group.
-* `volumes` - (Optional) The IDs of the SolidFire volumes to add to the
-  SolidFire volume access group.
+* `volumes` - (Optional) The IDs of the SolidFire volumes to add to the SolidFire volume access group.
+* `attributes` - (Optional) List of name-value pairs of volume access group attributes.
   
 ## Attributes Reference
 
 The following attributes are exported in addition to the arguments listed above:
 
 * `id` - The unique identifier for the volume access group.
-* `initiators` - Any initiators tied to the volume access group.
