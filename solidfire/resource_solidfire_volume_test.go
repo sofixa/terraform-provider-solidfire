@@ -102,9 +102,10 @@ func testAccCheckSolidFireVolumeAttributes(volume *element.Volume) resource.Test
 				if rs.Primary.ID != volume.AccountID {
 					fmt.Errorf("Volume account_id is %d, was expecting %d", volume.AccountID, rs.Primary.ID)
 				}
+			}
 		}	
-
-        return nil
+		return nil
+	}
 }
 
 
