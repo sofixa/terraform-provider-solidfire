@@ -14,8 +14,7 @@ import (
 )
 
 type CreateVolumeAccessGroupRequest struct {
-	Name string `structs:"name"`
-	//	Initiators []string    `structs:"initiators"`
+	Name       string      `structs:"name"`
 	Volumes    []int       `structs:"volumes"`
 	Attributes interface{} `structs:"attributes"`
 	ID         int         `structs:"id"`
@@ -33,12 +32,11 @@ type DeleteVolumeAccessGroupRequest struct {
 }
 
 type ModifyVolumeAccessGroupRequest struct {
-	VolumeAccessGroupID int         `structs:"volumeAccessGroupID"`
-	Name                string      `structs:"name"`
-	Attributes          interface{} `structs:"attributes"`
-	//Initiators             []int       `structs:"initiators"`
-	DeleteOrphanInitiators bool  `structs:"deleteOrphanInitiators"`
-	Volumes                []int `structs:"volumes"`
+	VolumeAccessGroupID    int         `structs:"volumeAccessGroupID"`
+	Name                   string      `structs:"name"`
+	Attributes             interface{} `structs:"attributes"`
+	DeleteOrphanInitiators bool        `structs:"deleteOrphanInitiators"`
+	Volumes                []int       `structs:"volumes"`
 }
 
 func resourceSolidFireVolumeAccessGroup() *schema.Resource {
@@ -67,13 +65,6 @@ func resourceSolidFireVolumeAccessGroup() *schema.Resource {
 			"attributes": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-			},
-			"initiators": {
-				Type:     schema.TypeList,
-				Computed: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -162,7 +153,6 @@ func resourceSolidFireVolumeAccessGroupRead(d *schema.ResourceData, meta interfa
 	}
 
 	d.Set("name", res.VolumeAccessGroups[0].Name)
-	d.Set("initiators", res.VolumeAccessGroups[0].Initiators)
 	d.Set("volumes", res.VolumeAccessGroups[0].Volumes)
 
 	return nil

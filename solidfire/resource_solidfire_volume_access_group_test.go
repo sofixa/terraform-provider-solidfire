@@ -35,7 +35,6 @@ func TestVolumeAccessGroup_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "name", "terraform-acceptance-test"),
 					resource.TestCheckResourceAttrSet("solidfire_volume_access_group.terraform-acceptance-test-1", "id"),
 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "volumes.#", "1"),
-					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "initiators.#", "1"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "name", "Terraform-Acceptance-Volume-1"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "total_size", "1080033280"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "enable512e", "true"),
@@ -72,7 +71,6 @@ func TestVolumeAccessGroup_update(t *testing.T) {
 					testAccCheckSolidFireVolumeAccessGroupAttributes(&volumeAccessGroup, "terraform-acceptance-test"),
 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "name", "terraform-acceptance-test"),
 					resource.TestCheckResourceAttrSet("solidfire_volume_access_group.terraform-acceptance-test-1", "id"),
-					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "initiators.#", "1"),
 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "volumes.#", "1"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "name", "Terraform-Acceptance-Volume-1"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "total_size", "1080033280"),
@@ -105,7 +103,6 @@ func TestVolumeAccessGroup_update(t *testing.T) {
 					testAccCheckSolidFireVolumeAccessGroupAttributes(&volumeAccessGroup, "terraform-acceptance-test-update"),
 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "name", "terraform-acceptance-test-update"),
 					resource.TestCheckResourceAttrSet("solidfire_volume_access_group.terraform-acceptance-test-1", "id"),
-					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "initiators.#", "2"),
 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "volumes.#", "2"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "name", "Terraform-Acceptance-Volume-1"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "total_size", "1090519040"),
@@ -213,21 +210,7 @@ func testAccCheckSolidFireVolumeAccessGroupAttributes(volumeAccessGroup *element
 				if is_present == false {
 					return fmt.Errorf("Volume id %d not present in Volume Access Group %v", convID, volumeAccessGroup)
 				}
-			} else if rs.Type == "solidfire_initiator" {
-				// placeholder variable
-				is_present := false
-				// for earch initiator on the VolumeAccessGroup, check if it's also on the Terraform side
-				for _, initiator := range volumeAccessGroup.Initiators {
-					log.Printf("[DEBUG] Comparing initiator %s to initiator from Volume Access Group %s", rs.Primary.Attributes["name"], initiator)
-					if initiator == rs.Primary.Attributes["name"] {
-						is_present = true
-						break
-					}
-				}
-				if is_present == false {
-					return fmt.Errorf("Initiator %s not present in Volume Access Group %v", rs.Primary.Attributes["name"], volumeAccessGroup)
-				}
-			}
+			} 
 		}
 		return nil
 	}
@@ -284,12 +267,6 @@ resource "solidfire_account" "terraform-acceptance-test-1" {
 	username = "terraform-acceptance-test-vag"
 }
 
-resource "solidfire_initiator" "terraform-acceptance-test-1" {
-	name = "terraform-acceptance-test-1"
-	alias = "terraform-acceptance-test-1-alias"
-	volume_access_group_id = "${solidfire_volume_access_group.terraform-acceptance-test-1.id}"
-}
-
 `
 
 const testAccCheckSolidFireVolumeAccessGroupConfigUpdate = `
@@ -317,18 +294,6 @@ resource "solidfire_volume" "terraform-acceptance-test-2" {
 }
 resource "solidfire_account" "terraform-acceptance-test-1" {
 	username = "terraform-acceptance-test-vag"
-}
-
-resource "solidfire_initiator" "terraform-acceptance-test-1" {
-	name = "terraform-acceptance-test-1"
-	alias = "terraform-acceptance-test-1-alias"
-	volume_access_group_id = "${solidfire_volume_access_group.terraform-acceptance-test-1.id}"
-}
-
-resource "solidfire_initiator" "terraform-acceptance-test-2" {
-	name = "terraform-acceptance-test-2"
-	alias = "terraform-acceptance-test-2-alias"
-	volume_access_group_id = "${solidfire_volume_access_group.terraform-acceptance-test-1.id}"
 }
 
 `
