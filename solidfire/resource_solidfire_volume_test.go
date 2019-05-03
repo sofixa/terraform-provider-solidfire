@@ -99,8 +99,12 @@ func testAccCheckSolidFireVolumeAttributes(volume *element.Volume) resource.Test
 		// Check volume's account_id and volume_access_group_id are correct
 		for _, rs := range s.RootModule().Resources {
 			if rs.Type == "solidfire_account" {
-				if rs.Primary.ID != volume.AccountID {
-					fmt.Errorf("Volume account_id is %d, was expecting %d", volume.AccountID, rs.Primary.ID)
+				convID, err := strconv.Atoi(rs.Primary.ID)
+				if err != nil {
+					return err
+				}		
+				if convID != volume.AccountID {
+					fmt.Errorf("Volume account_id is %d, was expecting %d", volume.AccountID, convID)
 				}
 			}
 		}	
