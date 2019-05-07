@@ -89,7 +89,7 @@ func TestVolume_update(t *testing.T) {
 					"terraform-acceptance-test",
 					"1090519040",
 					"true",
-					"700",
+					"650",
 					"8600",
 					"9600",
 				),
