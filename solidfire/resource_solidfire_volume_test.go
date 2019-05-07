@@ -187,7 +187,7 @@ func testAccCheckSolidFireVolumeAttributesUpdate(volume *element.Volume) resourc
 		if volume.Enable512e != true {
 			return fmt.Errorf("Volume 512e isn't enabled")
 		}
-		if volume.QOS.MinIOPS != 540 {
+		if volume.QOS.MinIOPS != 650 {
 			return fmt.Errorf("Volume min_iops is %d, was expecting %d", volume.QOS.MinIOPS, 650)
 		}
 		if volume.QOS.MaxIOPS != 8600 {
