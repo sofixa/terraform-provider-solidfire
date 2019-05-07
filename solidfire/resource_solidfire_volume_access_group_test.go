@@ -123,44 +123,44 @@ func TestVolumeAccessGroup_update(t *testing.T) {
 	})
 }
 
-/*func TestVolumeAccessGroup_removeVolumes(t *testing.T) {
- 	var volumeAccessGroup element.VolumeAccessGroup
- 	resource.Test(t, resource.TestCase{
- 		PreCheck:     func() { testAccPreCheck(t) },
- 		Providers:    testAccProviders,
- 		CheckDestroy: testAccCheckSolidFireVolumeAccessGroupDestroy,
- 		Steps: []resource.TestStep{
- 			{
- 				Config: fmt.Sprintf(
- 					testAccCheckSolidFireVolumeAccessGroupConfig,
-					 "terraform-acceptance-test",
-					 "Terraform-Acceptance-Volume-1",
-					 "1080033280",
-					 "true",
-					 "600",
-					 "8000",
-					 "8000",
-				  ),
- 				Check: resource.ComposeTestCheckFunc(
- 					testAccCheckSolidFireVolumeAccessGroupExists("solidfire_volume_access_group.terraform-acceptance-test-1", &volumeAccessGroup),
-					 resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "name", "terraform-acceptance-test"),
+func TestVolumeAccessGroup_removeVolumes(t *testing.T) {
+	var volumeAccessGroup element.VolumeAccessGroup
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSolidFireVolumeAccessGroupDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(
+					testAccCheckSolidFireVolumeAccessGroupConfig,
+					"terraform-acceptance-test",
+					"Terraform-Acceptance-Volume-1",
+					"1080033280",
+					"true",
+					"600",
+					"8000",
+					"8000",
+				),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSolidFireVolumeAccessGroupExists("solidfire_volume_access_group.terraform-acceptance-test-1", &volumeAccessGroup),
+					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "name", "terraform-acceptance-test"),
 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "volumes.#", "1"),
- 				),
- 			},
- 			{
- 				Config: fmt.Sprintf(
- 					testAccCheckSolidFireVolumeAccessGroupConfigRemoveVolumes,
- 					"terraform-acceptance-test-remove",
- 				),
- 				Check: resource.ComposeTestCheckFunc(
- 					testAccCheckSolidFireVolumeAccessGroupExists("solidfire_volume_access_group.terraform-acceptance-test-1", &volumeAccessGroup),
- 					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "name", "terraform-acceptance-test-update"),
- 				),
- 			},
- 		},
- 	})
- }
-*/
+				),
+			},
+			{
+				Config: fmt.Sprintf(
+					testAccCheckSolidFireVolumeAccessGroupConfigRemoveVolumes,
+					"terraform-acceptance-test-remove",
+				),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSolidFireVolumeAccessGroupExists("solidfire_volume_access_group.terraform-acceptance-test-1", &volumeAccessGroup),
+					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "name", "terraform-acceptance-test-remove"),
+					resource.TestCheckResourceAttr("solidfire_volume_access_group.terraform-acceptance-test-1", "volumes.#", "0"),
+				),
+			},
+		},
+	})
+}
 
 func testAccCheckSolidFireVolumeAccessGroupDestroy(s *terraform.State) error {
 	virConn := testAccProvider.Meta().(*element.Client)
@@ -210,7 +210,7 @@ func testAccCheckSolidFireVolumeAccessGroupAttributes(volumeAccessGroup *element
 				if is_present == false {
 					return fmt.Errorf("Volume id %d not present in Volume Access Group %v", convID, volumeAccessGroup)
 				}
-			} 
+			}
 		}
 		return nil
 	}
@@ -301,6 +301,6 @@ resource "solidfire_account" "terraform-acceptance-test-1" {
 const testAccCheckSolidFireVolumeAccessGroupConfigRemoveVolumes = `
 resource "solidfire_volume_access_group" "terraform-acceptance-test-1" {
 	name = "%s"
-	volumes = ["${solidfire_volume.terraform-acceptance-test-1.id}"]
+	volumes = []
 }
 `
