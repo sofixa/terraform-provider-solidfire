@@ -201,8 +201,6 @@ func resourceSolidFireVolumeAccessGroupUpdate(d *schema.ResourceData, meta inter
 		for _, v := range raw.([]interface{}) {
 			vag.Volumes = append(vag.Volumes, v.(int))
 		}
-	} else {
-		return fmt.Errorf("expecting an array of volume ids to change")
 	}
 
 	err := modifyVolumeAccessGroup(client, vag)
