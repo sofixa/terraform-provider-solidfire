@@ -37,6 +37,7 @@ func TestVolume_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "burst_iops", "10000"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "access", "readWrite"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "status", "active"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "purge_on_delete", "false"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "volume_id"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "iqn"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "block_size"),
@@ -76,6 +77,7 @@ func TestVolume_update(t *testing.T) {
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "burst_iops", "10000"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "access", "readWrite"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "status", "active"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "purge_on_delete", "false"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "volume_id"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "iqn"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "block_size"),
@@ -92,6 +94,7 @@ func TestVolume_update(t *testing.T) {
 					"650",
 					"8600",
 					"9600",
+					"true",
 				),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSolidFireVolumeExists("solidfire_volume.terraform-acceptance-test-1", &volume),
@@ -99,6 +102,7 @@ func TestVolume_update(t *testing.T) {
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "name", "terraform-acceptance-test"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "total_size", "1090519040"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "enable512e", "true"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "purge_on_delete", "true"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "min_iops", "650"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "max_iops", "8600"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "burst_iops", "9600"),
@@ -110,15 +114,40 @@ func TestVolume_update(t *testing.T) {
 
 func testAccCheckSolidFireVolumeDestroy(s *terraform.State) error {
 	virConn := testAccProvider.Meta().(*element.Client)
+	var volume element.Volume
+	var err error
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "solidfire_volume" {
 			continue
 		}
 
-		_, err := virConn.GetVolumeByID(rs.Primary.ID)
-		if err == nil {
-			return fmt.Errorf("Error waiting for volume (%s) to be destroyed: %s", rs.Primary.ID, err)
+		volume, err = virConn.GetVolumeByID(rs.Primary.ID)
+		// volume should have been purged
+		if rs.Primary.Attributes["purge_on_delete"] == "true" {
+			if err == nil {
+				return fmt.Errorf("Error waiting for volume %s to be destroyed, it should have been purged", rs.Primary.ID)
+			}
+		} else {
+			// if there isn't an error, the volume still exists, as it should
+			if err == nil {
+				// if the volume's status isn't deleted, it isn't marked as to be purged
+				if volume.Status != "deleted" {
+					return fmt.Errorf("Volume %s still exists and status isn't deleted, it's %s", rs.Primary.ID, volume.Status)
+					// everything is working fine (volume was marked as deleted and will be by the SF), launch an explicit purge to make place for future tests
+				} else {
+					delVolume := DeleteVolumeRequest{}
+					convID, convErr := strconv.Atoi(rs.Primary.ID)
+
+					if convErr != nil {
+						return fmt.Errorf("id argument is required")
+					}
+					delVolume.VolumeID = convID
+					//	virConn.PurgeDeletedVolume(delVolume)
+				}
+			} else {
+				return fmt.Errorf("Volume %s doesn't exist anymore, but it shouldn't have been purged", rs.Primary.ID)
+			}
 		}
 	}
 
@@ -275,6 +304,7 @@ resource "solidfire_volume" "terraform-acceptance-test-1" {
 	min_iops = "%s"
 	max_iops = "%s"
 	burst_iops = "%s"
+	purge_on_delete = "%s"
 }
 
 resource "solidfire_account" "terraform-acceptance-test-1" {

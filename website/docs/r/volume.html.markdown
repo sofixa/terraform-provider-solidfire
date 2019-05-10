@@ -41,6 +41,7 @@ The following arguments are supported:
 * `min_iops` - (Optional) The minimum initial quality of service.
 * `max_iops` - (Optional) The maximum initial quality of service.
 * `burst_iops` - (Optional) The burst initial quality of service.
+* `purge_on_delete` - (Optional, default false) Whether or not to purge the volume after deletion.
   
 ## Attributes Reference
 

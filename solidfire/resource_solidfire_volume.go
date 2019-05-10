@@ -125,6 +125,11 @@ func resourceSolidFireVolume() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
+			"purge_on_delete": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 		},
 	}
 }
@@ -327,12 +332,15 @@ func resourceSolidFireVolumeDelete(d *schema.ResourceData, meta interface{}) err
 	if deleteErr != nil {
 		return deleteErr
 	}
-
-	purgeErr := purgeDeletedVolume(client, volume)
-	if purgeErr != nil {
-		return purgeErr
+	// only purge the deleted volume if purge_on_delete is set to true
+	if v, ok := d.GetOk("purge_on_delete"); ok {
+		if v.(bool) {
+			purgeErr := purgeDeletedVolume(client, volume)
+			if purgeErr != nil {
+				return purgeErr
+			}
+		}
 	}
-
 	return nil
 }
 
