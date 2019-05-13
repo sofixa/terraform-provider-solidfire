@@ -153,4 +153,3 @@ func (c *Client) DeleteInitiator(request DeleteInitiatorsRequest) error {
 
 	return nil
 }
-

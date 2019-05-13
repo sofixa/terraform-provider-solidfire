@@ -145,7 +145,7 @@ func testAccCheckSolidFireVolumeDestroy(s *terraform.State) error {
 					delVolume.VolumeID = convID
 					err := virConn.PurgeDeletedVolume(delVolume)
 					if err != nil {
-						return fmt.Errorf("Failed purging volume %s due to error %s",rs.Primary.ID, err)
+						return fmt.Errorf("Failed purging volume %s due to error %s", rs.Primary.ID, err)
 					}
 				}
 			} else {
