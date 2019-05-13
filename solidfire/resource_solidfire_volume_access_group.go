@@ -5,39 +5,10 @@ import (
 	"log"
 	"strconv"
 
-	"encoding/json"
-
-	"github.com/fatih/structs"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sofixa/terraform-provider-solidfire/solidfire/element"
 	"github.com/sofixa/terraform-provider-solidfire/solidfire/element/jsonrpc"
 )
-
-type CreateVolumeAccessGroupRequest struct {
-	Name       string      `structs:"name"`
-	Volumes    []int       `structs:"volumes"`
-	Attributes interface{} `structs:"attributes"`
-	ID         int         `structs:"id"`
-}
-
-type CreateVolumeAccessGroupResult struct {
-	VolumeAccessGroupID int `json:"volumeAccessGroupID"`
-	element.VolumeAccessGroup
-}
-
-type DeleteVolumeAccessGroupRequest struct {
-	VolumeAccessGroupID    int  `structs:"volumeAccessGroupID"`
-	DeleteOrphanInitiators bool `structs:"deleteOrphanInitiators"`
-	Force                  bool `structs:"force"`
-}
-
-type ModifyVolumeAccessGroupRequest struct {
-	VolumeAccessGroupID    int         `structs:"volumeAccessGroupID"`
-	Name                   string      `structs:"name"`
-	Attributes             interface{} `structs:"attributes"`
-	DeleteOrphanInitiators bool        `structs:"deleteOrphanInitiators"`
-	Volumes                []int       `structs:"volumes"`
-}
 
 func resourceSolidFireVolumeAccessGroup() *schema.Resource {
 	return &schema.Resource{
@@ -77,7 +48,7 @@ func resourceSolidFireVolumeAccessGroupCreate(d *schema.ResourceData, meta inter
 	log.Printf("[DEBUG] Creating volume access group: %#v", d)
 	client := meta.(*element.Client)
 
-	vag := CreateVolumeAccessGroupRequest{}
+	vag := element.CreateVolumeAccessGroupRequest{}
 
 	if v, ok := d.GetOk("name"); ok {
 		vag.Name = v.(string)
@@ -91,7 +62,7 @@ func resourceSolidFireVolumeAccessGroupCreate(d *schema.ResourceData, meta inter
 		}
 	}
 
-	resp, err := createVolumeAccessGroup(client, vag)
+	resp, err := client.CreateVolumeAccessGroup(vag)
 	if err != nil {
 		log.Print("Error creating volume access group")
 		return err
@@ -101,25 +72,6 @@ func resourceSolidFireVolumeAccessGroupCreate(d *schema.ResourceData, meta inter
 	log.Printf("[DEBUG] Created volume access group: %v %v", vag.Name, resp.VolumeAccessGroupID)
 
 	return resourceSolidFireVolumeAccessGroupRead(d, meta)
-}
-
-func createVolumeAccessGroup(client *element.Client, request CreateVolumeAccessGroupRequest) (CreateVolumeAccessGroupResult, error) {
-	params := structs.Map(request)
-
-	log.Printf("[DEBUG] Parameters: %v", params)
-
-	response, err := client.CallAPIMethod("CreateVolumeAccessGroup", params)
-	if err != nil {
-		log.Print("CreateVolumeAccessGroup request failed")
-		return CreateVolumeAccessGroupResult{}, err
-	}
-
-	var result CreateVolumeAccessGroupResult
-	if err := json.Unmarshal([]byte(*response), &result); err != nil {
-		log.Print("Failed to unmarshall response from CreateVolumeAccessGroup")
-		return CreateVolumeAccessGroupResult{}, err
-	}
-	return result, nil
 }
 
 func resourceSolidFireVolumeAccessGroupRead(d *schema.ResourceData, meta interface{}) error {
@@ -139,7 +91,7 @@ func resourceSolidFireVolumeAccessGroupRead(d *schema.ResourceData, meta interfa
 	s[0] = convID
 	vags.VolumeAccessGroups = s
 
-	res, err := listVolumeAccessGroups(client, vags)
+	res, err := client.ListVolumeAccessGroups(vags)
 	if err != nil {
 		return err
 	}
@@ -158,29 +110,11 @@ func resourceSolidFireVolumeAccessGroupRead(d *schema.ResourceData, meta interfa
 	return nil
 }
 
-func listVolumeAccessGroups(client *element.Client, request element.ListVolumeAccessGroupsRequest) (element.ListVolumeAccessGroupsResult, error) {
-	params := structs.Map(request)
-
-	response, err := client.CallAPIMethod("ListVolumeAccessGroups", params)
-	if err != nil {
-		log.Print("ListVolumeAccessGroups request failed")
-		return element.ListVolumeAccessGroupsResult{}, err
-	}
-
-	var result element.ListVolumeAccessGroupsResult
-	if err := json.Unmarshal([]byte(*response), &result); err != nil {
-		log.Print("Failed to unmarshall response from ListVolumeAccessGroups")
-		return element.ListVolumeAccessGroupsResult{}, err
-	}
-
-	return result, nil
-}
-
 func resourceSolidFireVolumeAccessGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Updating volume access group %#v", d)
 	client := meta.(*element.Client)
 
-	vag := ModifyVolumeAccessGroupRequest{}
+	vag := element.ModifyVolumeAccessGroupRequest{}
 
 	id := d.Id()
 	convID, convErr := strconv.Atoi(id)
@@ -203,20 +137,8 @@ func resourceSolidFireVolumeAccessGroupUpdate(d *schema.ResourceData, meta inter
 		}
 	}
 
-	err := modifyVolumeAccessGroup(client, vag)
+	err := client.ModifyVolumeAccessGroup(vag)
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func modifyVolumeAccessGroup(client *element.Client, request ModifyVolumeAccessGroupRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("ModifyVolumeAccessGroup", params)
-	if err != nil {
-		log.Print("ModifyVolumeAccessGroup request failed")
 		return err
 	}
 
@@ -227,7 +149,7 @@ func resourceSolidFireVolumeAccessGroupDelete(d *schema.ResourceData, meta inter
 	log.Printf("[DEBUG] Deleting volume access group: %#v", d)
 	client := meta.(*element.Client)
 
-	vag := DeleteVolumeAccessGroupRequest{}
+	vag := element.DeleteVolumeAccessGroupRequest{}
 
 	id := d.Id()
 	convID, convErr := strconv.Atoi(id)
@@ -237,20 +159,8 @@ func resourceSolidFireVolumeAccessGroupDelete(d *schema.ResourceData, meta inter
 	}
 	vag.VolumeAccessGroupID = convID
 
-	err := deleteVolumeAccessGroup(client, vag)
+	err := client.DeleteVolumeAccessGroup(vag)
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func deleteVolumeAccessGroup(client *element.Client, request DeleteVolumeAccessGroupRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("DeleteVolumeAccessGroup", params)
-	if err != nil {
-		log.Print("DeleteVolumeAccessGroup request failed")
 		return err
 	}
 
@@ -274,7 +184,7 @@ func resourceSolidFireVolumeAccessGroupExists(d *schema.ResourceData, meta inter
 	s[0] = convID
 	vags.VolumeAccessGroups = s
 
-	res, err := listVolumeAccessGroups(client, vags)
+	res, err := client.ListVolumeAccessGroups(vags)
 	if err != nil {
 		if err, ok := err.(*jsonrpc.ResponseError); ok {
 			if err.Name == "xUnknown" {
