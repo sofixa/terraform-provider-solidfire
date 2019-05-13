@@ -282,6 +282,7 @@ resource "solidfire_volume" "terraform-acceptance-test-1" {
 	min_iops = "%s"
 	max_iops = "%s"
 	burst_iops = "%s"
+	purge_on_delete = true
 }
 resource "solidfire_volume" "terraform-acceptance-test-2" {
 	name = "%s"
@@ -291,6 +292,7 @@ resource "solidfire_volume" "terraform-acceptance-test-2" {
 	min_iops = "%s"
 	max_iops = "%s"
 	burst_iops = "%s"
+	purge_on_delete = true
 }
 resource "solidfire_account" "terraform-acceptance-test-1" {
 	username = "terraform-acceptance-test-vag"
