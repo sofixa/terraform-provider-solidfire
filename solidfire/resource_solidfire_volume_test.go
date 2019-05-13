@@ -143,7 +143,10 @@ func testAccCheckSolidFireVolumeDestroy(s *terraform.State) error {
 						return fmt.Errorf("id argument is required")
 					}
 					delVolume.VolumeID = convID
-					//virConn.PurgeDeletedVolume(delVolume)
+					err := virConn.PurgeDeletedVolume(delVolume)
+					if err != nil {
+						return fmt.Errorf("Failed purging volume %s due to error %s",rs.Primary.ID, err)
+					}
 				}
 			} else {
 				return fmt.Errorf("Volume %s doesn't exist anymore, but it shouldn't have been purged", rs.Primary.ID)
