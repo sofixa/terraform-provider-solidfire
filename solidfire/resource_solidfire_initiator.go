@@ -138,7 +138,7 @@ func resourceSolidFireInitiatorUpdate(d *schema.ResourceData, meta interface{}) 
 	log.Printf("[DEBUG] Updating initiator: %#v", d)
 	client := meta.(*element.Client)
 
-	initiators := ModifyInitiatorsRequest{}
+	initiators := element.ModifyInitiatorsRequest{}
 	initiator := make([]element.Initiator, 1)
 
 	id := d.Id()
@@ -185,7 +185,7 @@ func resourceSolidFireInitiatorDelete(d *schema.ResourceData, meta interface{}) 
 	s[0] = convID
 	initiators.Initiators = s
 
-	err := client.DeleteInitiator(client)
+	err := client.DeleteInitiator(initiators)
 	if err != nil {
 		return err
 	}
