@@ -1,37 +1,14 @@
 package solidfire
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
 
-	"github.com/fatih/structs"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sofixa/terraform-provider-solidfire/solidfire/element"
 	"github.com/sofixa/terraform-provider-solidfire/solidfire/element/jsonrpc"
 )
-
-type StorageDevice struct {
-	Device string
-	IQN    string
-}
-
-type CreateInitiatorsRequest struct {
-	Initiators []element.Initiator `structs:"initiators"`
-}
-
-type CreateInitiatorsResult struct {
-	Initiators []element.InitiatorResponse `json:"initiators"`
-}
-
-type DeleteInitiatorsRequest struct {
-	Initiators []int `structs:"initiators"`
-}
-
-type ModifyInitiatorsRequest struct {
-	Initiators []element.Initiator `structs:"initiators"`
-}
 
 func resourceSolidFireInitiator() *schema.Resource {
 	return &schema.Resource{
@@ -79,7 +56,7 @@ func resourceSolidFireInitiatorCreate(d *schema.ResourceData, meta interface{}) 
 	log.Printf("[DEBUG] Creating initiator: %#v", d)
 	client := meta.(*element.Client)
 
-	initiators := CreateInitiatorsRequest{}
+	initiators := element.CreateInitiatorsRequest{}
 	newInitiator := make([]element.Initiator, 1)
 	var iqns []string
 
@@ -108,7 +85,7 @@ func resourceSolidFireInitiatorCreate(d *schema.ResourceData, meta interface{}) 
 
 	initiators.Initiators = newInitiator
 
-	resp, err := createInitiators(client, initiators)
+	resp, err := client.CreateInitiators(initiators)
 	if err != nil {
 		log.Print("Error creating initiator")
 		return err
@@ -118,26 +95,6 @@ func resourceSolidFireInitiatorCreate(d *schema.ResourceData, meta interface{}) 
 	log.Printf("[DEBUG] Created initiator: %v %v", newInitiator[0].Name, resp.Initiators[0].ID)
 
 	return resourceSolidFireInitiatorRead(d, meta)
-}
-
-func createInitiators(client *element.Client, request CreateInitiatorsRequest) (CreateInitiatorsResult, error) {
-	params := structs.Map(request)
-
-	log.Printf("[DEBUG] Parameters: %v", params)
-
-	response, err := client.CallAPIMethod("CreateInitiators", params)
-	if err != nil {
-		log.Print("CreateInitiators request failed")
-		return CreateInitiatorsResult{}, err
-	}
-
-	var result CreateInitiatorsResult
-	if err := json.Unmarshal([]byte(*response), &result); err != nil {
-		log.Print("Failed to unmarshall resposne from CreateInitiators")
-		return CreateInitiatorsResult{}, err
-	}
-	log.Printf("[DEBUG] Initiator Result: %v", result)
-	return result, nil
 }
 
 func resourceSolidFireInitiatorRead(d *schema.ResourceData, meta interface{}) error {
@@ -157,7 +114,7 @@ func resourceSolidFireInitiatorRead(d *schema.ResourceData, meta interface{}) er
 	s[0] = convID
 	initiators.Initiators = s
 
-	res, err := listInitiators(client, initiators)
+	res, err := client.ListInitiators(initiators)
 	if err != nil {
 		return err
 	}
@@ -175,24 +132,6 @@ func resourceSolidFireInitiatorRead(d *schema.ResourceData, meta interface{}) er
 	}
 
 	return nil
-}
-
-func listInitiators(client *element.Client, request element.ListInitiatorRequest) (element.ListInitiatorResult, error) {
-	params := structs.Map(request)
-
-	response, err := client.CallAPIMethod("ListInitiators", params)
-	if err != nil {
-		log.Print("ListInitiators request failed")
-		return element.ListInitiatorResult{}, err
-	}
-
-	var result element.ListInitiatorResult
-	if err := json.Unmarshal([]byte(*response), &result); err != nil {
-		log.Print("Failed to unmarshall response from ListInitiators")
-		return element.ListInitiatorResult{}, err
-	}
-
-	return result, nil
 }
 
 func resourceSolidFireInitiatorUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -221,20 +160,8 @@ func resourceSolidFireInitiatorUpdate(d *schema.ResourceData, meta interface{}) 
 
 	initiators.Initiators = initiator
 
-	err := modifyInitiators(client, initiators)
+	err := client.ModifyInitiators(initiators)
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func modifyInitiators(client *element.Client, request ModifyInitiatorsRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("ModifyInitiators", params)
-	if err != nil {
-		log.Print("ModifyInitiators request failed")
 		return err
 	}
 
@@ -245,7 +172,7 @@ func resourceSolidFireInitiatorDelete(d *schema.ResourceData, meta interface{}) 
 	log.Printf("[DEBUG] Deleting initiator: %#v", d)
 	client := meta.(*element.Client)
 
-	initiators := DeleteInitiatorsRequest{}
+	initiators := element.DeleteInitiatorsRequest{}
 
 	id := d.Id()
 	s := make([]int, 1)
@@ -258,20 +185,8 @@ func resourceSolidFireInitiatorDelete(d *schema.ResourceData, meta interface{}) 
 	s[0] = convID
 	initiators.Initiators = s
 
-	err := deleteInitiator(client, initiators)
+	err := client.DeleteInitiator(client)
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func deleteInitiator(client *element.Client, request DeleteInitiatorsRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("DeleteInitiators", params)
-	if err != nil {
-		log.Print("DeleteInitiator request failed")
 		return err
 	}
 
@@ -295,7 +210,7 @@ func resourceSolidFireInitiatorExists(d *schema.ResourceData, meta interface{}) 
 	s[0] = convID
 	initiators.Initiators = s
 
-	res, err := listInitiators(client, initiators)
+	res, err := client.ListInitiators(initiators)
 	if err != nil {
 		if err, ok := err.(*jsonrpc.ResponseError); ok {
 			if err.Name == "xUnknown" {

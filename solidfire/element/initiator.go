@@ -32,6 +32,27 @@ type InitiatorResponse struct {
 	VolumeAccessGroups []int       `json:"volumeAccessGroups"`
 }
 
+type StorageDevice struct {
+	Device string
+	IQN    string
+}
+
+type CreateInitiatorsRequest struct {
+	Initiators []Initiator `structs:"initiators"`
+}
+
+type CreateInitiatorsResult struct {
+	Initiators []InitiatorResponse `json:"initiators"`
+}
+
+type DeleteInitiatorsRequest struct {
+	Initiators []int `structs:"initiators"`
+}
+
+type ModifyInitiatorsRequest struct {
+	Initiators []Initiator `structs:"initiators"`
+}
+
 func (c *Client) GetInitiatorByID(id string) (Initiator, error) {
 	convID, err := strconv.Atoi(id)
 	if err != nil {
@@ -70,3 +91,66 @@ func (c *Client) GetInitiatorByID(id string) (Initiator, error) {
 
 	return initiator, nil
 }
+
+func (c *Client) CreateInitiators(request CreateInitiatorsRequest) (CreateInitiatorsResult, error) {
+	params := structs.Map(request)
+
+	log.Printf("[DEBUG] Parameters: %v", params)
+
+	response, err := c.CallAPIMethod("CreateInitiators", params)
+	if err != nil {
+		log.Print("CreateInitiators request failed")
+		return CreateInitiatorsResult{}, err
+	}
+
+	var result CreateInitiatorsResult
+	if err := json.Unmarshal([]byte(*response), &result); err != nil {
+		log.Print("Failed to unmarshall resposne from CreateInitiators")
+		return CreateInitiatorsResult{}, err
+	}
+	log.Printf("[DEBUG] Initiator Result: %v", result)
+	return result, nil
+}
+
+func (c *Client) ListInitiators(request ListInitiatorRequest) (ListInitiatorResult, error) {
+	params := structs.Map(request)
+
+	response, err := c.CallAPIMethod("ListInitiators", params)
+	if err != nil {
+		log.Print("ListInitiators request failed")
+		return ListInitiatorResult{}, err
+	}
+
+	var result ListInitiatorResult
+	if err := json.Unmarshal([]byte(*response), &result); err != nil {
+		log.Print("Failed to unmarshall response from ListInitiators")
+		return ListInitiatorResult{}, err
+	}
+
+	return result, nil
+}
+
+func (c *Client) ModifyInitiators(request ModifyInitiatorsRequest) error {
+	params := structs.Map(request)
+
+	_, err := c.CallAPIMethod("ModifyInitiators", params)
+	if err != nil {
+		log.Print("ModifyInitiators request failed")
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) DeleteInitiator(request DeleteInitiatorsRequest) error {
+	params := structs.Map(request)
+
+	_, err := c.CallAPIMethod("DeleteInitiators", params)
+	if err != nil {
+		log.Print("DeleteInitiator request failed")
+		return err
+	}
+
+	return nil
+}
+
