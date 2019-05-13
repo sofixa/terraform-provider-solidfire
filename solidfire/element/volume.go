@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/fatih/structs"
 	"strconv"
+
+	"github.com/fatih/structs"
 )
 
 type ListVolumesRequest struct {
@@ -26,6 +27,32 @@ type QualityOfService struct {
 	MinIOPS   int `structs:"minIOPS"`
 	MaxIOPS   int `structs:"maxIOPS"`
 	BurstIOPS int `structs:"burstIOPS"`
+}
+
+type CreateVolumeRequest struct {
+	Name       string           `structs:"name"`
+	AccountID  int              `structs:"accountID"`
+	TotalSize  int              `structs:"totalSize"`
+	Enable512E bool             `structs:"enable512e"`
+	Attributes interface{}      `structs:"attributes"`
+	QOS        QualityOfService `structs:"qos"`
+}
+
+type CreateVolumeResult struct {
+	VolumeID int    `json:"volumeID"`
+	Volume   Volume `json:"volume"`
+}
+
+type ModifyVolumeRequest struct {
+	VolumeID   int              `structs:"volumeID"`
+	AccountID  int              `structs:"accountID"`
+	Attributes interface{}      `structs:"attributes"`
+	QOS        QualityOfService `structs:"qos"`
+	TotalSize  int              `structs:"totalSize"`
+}
+
+type DeleteVolumeRequest struct {
+	VolumeID int `structs:"volumeID"`
 }
 
 type Volume struct {
@@ -107,4 +134,77 @@ func (c *Client) GetVolumeByAccount(id string) ([]Volume, error) {
 	}
 
 	return result.Volumes, nil
+}
+
+func (c *Client) CreateVolume(request CreateVolumeRequest) (CreateVolumeResult, error) {
+	params := structs.Map(request)
+
+	log.Printf("[DEBUG] Parameters: %v", params)
+
+	response, err := c.CallAPIMethod("CreateVolume", params)
+	if err != nil {
+		log.Print("CreateVolume request failed")
+		return CreateVolumeResult{}, err
+	}
+
+	var result CreateVolumeResult
+	if err := json.Unmarshal([]byte(*response), &result); err != nil {
+		log.Print("Failed to unmarshall response from CreateVolume")
+		return CreateVolumeResult{}, err
+	}
+	return result, nil
+}
+
+func (c *Client) UpdateVolume(request ModifyVolumeRequest) error {
+	params := structs.Map(request)
+
+	_, err := c.CallAPIMethod("ModifyVolume", params)
+	if err != nil {
+		log.Print("ModifyVolume request failed")
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) ListVolumes(request ListVolumesRequest) (ListVolumesResult, error) {
+	params := structs.Map(request)
+
+	response, err := c.CallAPIMethod("ListVolumes", params)
+	if err != nil {
+		log.Print("ListVolumes request failed")
+		return ListVolumesResult{}, err
+	}
+
+	var result ListVolumesResult
+	if err := json.Unmarshal([]byte(*response), &result); err != nil {
+		log.Print("Failed to unmarshall response from ListVolumes")
+		return ListVolumesResult{}, err
+	}
+
+	return result, nil
+}
+
+func (c *Client) DeleteVolume(request DeleteVolumeRequest) error {
+	params := structs.Map(request)
+
+	_, err := c.CallAPIMethod("DeleteVolume", params)
+	if err != nil {
+		log.Print("DeleteVolume request failed")
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) PurgeDeletedVolume(request DeleteVolumeRequest) error {
+	params := structs.Map(request)
+
+	_, err := c.CallAPIMethod("PurgeDeletedVolume", params)
+	if err != nil {
+		log.Print("PurgeDeletedVolume request failed")
+		return err
+	}
+
+	return nil
 }

@@ -136,14 +136,14 @@ func testAccCheckSolidFireVolumeDestroy(s *terraform.State) error {
 					return fmt.Errorf("Volume %s still exists and status isn't deleted, it's %s", rs.Primary.ID, volume.Status)
 					// everything is working fine (volume was marked as deleted and will be by the SF), launch an explicit purge to make place for future tests
 				} else {
-					delVolume := DeleteVolumeRequest{}
+					delVolume := element.DeleteVolumeRequest{}
 					convID, convErr := strconv.Atoi(rs.Primary.ID)
 
 					if convErr != nil {
 						return fmt.Errorf("id argument is required")
 					}
 					delVolume.VolumeID = convID
-					//	virConn.PurgeDeletedVolume(delVolume)
+					//virConn.PurgeDeletedVolume(delVolume)
 				}
 			} else {
 				return fmt.Errorf("Volume %s doesn't exist anymore, but it shouldn't have been purged", rs.Primary.ID)

@@ -5,45 +5,10 @@ import (
 	"log"
 	"strconv"
 
-	"encoding/json"
-
-	"github.com/fatih/structs"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sofixa/terraform-provider-solidfire/solidfire/element"
 	"github.com/sofixa/terraform-provider-solidfire/solidfire/element/jsonrpc"
 )
-
-type CreateVolumeRequest struct {
-	Name       string           `structs:"name"`
-	AccountID  int              `structs:"accountID"`
-	TotalSize  int              `structs:"totalSize"`
-	Enable512E bool             `structs:"enable512e"`
-	Attributes interface{}      `structs:"attributes"`
-	QOS        QualityOfService `structs:"qos"`
-}
-
-type CreateVolumeResult struct {
-	VolumeID int            `json:"volumeID"`
-	Volume   element.Volume `json:"volume"`
-}
-
-type DeleteVolumeRequest struct {
-	VolumeID int `structs:"volumeID"`
-}
-
-type ModifyVolumeRequest struct {
-	VolumeID   int              `structs:"volumeID"`
-	AccountID  int              `structs:"accountID"`
-	Attributes interface{}      `structs:"attributes"`
-	QOS        QualityOfService `structs:"qos"`
-	TotalSize  int              `structs:"totalSize"`
-}
-
-type QualityOfService struct {
-	MinIOPS   int `structs:"minIOPS"`
-	MaxIOPS   int `structs:"maxIOPS"`
-	BurstIOPS int `structs:"burstIOPS"`
-}
 
 func resourceSolidFireVolume() *schema.Resource {
 	return &schema.Resource{
@@ -138,7 +103,7 @@ func resourceSolidFireVolumeCreate(d *schema.ResourceData, meta interface{}) err
 	log.Printf("[DEBUG] Creating volume: %#v", d)
 	client := meta.(*element.Client)
 
-	volume := CreateVolumeRequest{}
+	volume := element.CreateVolumeRequest{}
 
 	if v, ok := d.GetOk("name"); ok {
 		volume.Name = v.(string)
@@ -176,7 +141,7 @@ func resourceSolidFireVolumeCreate(d *schema.ResourceData, meta interface{}) err
 		volume.QOS.BurstIOPS = v.(int)
 	}
 
-	resp, err := createVolume(client, volume)
+	resp, err := client.CreateVolume(volume)
 	if err != nil {
 		log.Print("Error creating volume")
 		return err
@@ -187,25 +152,6 @@ func resourceSolidFireVolumeCreate(d *schema.ResourceData, meta interface{}) err
 	log.Printf("[DEBUG] Created volume: %v %v", volume.Name, resp.VolumeID)
 
 	return resourceSolidFireVolumeRead(d, meta)
-}
-
-func createVolume(client *element.Client, request CreateVolumeRequest) (CreateVolumeResult, error) {
-	params := structs.Map(request)
-
-	log.Printf("[DEBUG] Parameters: %v", params)
-
-	response, err := client.CallAPIMethod("CreateVolume", params)
-	if err != nil {
-		log.Print("CreateVolume request failed")
-		return CreateVolumeResult{}, err
-	}
-
-	var result CreateVolumeResult
-	if err := json.Unmarshal([]byte(*response), &result); err != nil {
-		log.Print("Failed to unmarshall response from CreateVolume")
-		return CreateVolumeResult{}, err
-	}
-	return result, nil
 }
 
 func resourceSolidFireVolumeRead(d *schema.ResourceData, meta interface{}) error {
@@ -239,29 +185,11 @@ func resourceSolidFireVolumeRead(d *schema.ResourceData, meta interface{}) error
 
 }
 
-func listVolumes(client *element.Client, request element.ListVolumesRequest) (element.ListVolumesResult, error) {
-	params := structs.Map(request)
-
-	response, err := client.CallAPIMethod("ListVolumes", params)
-	if err != nil {
-		log.Print("ListVolumes request failed")
-		return element.ListVolumesResult{}, err
-	}
-
-	var result element.ListVolumesResult
-	if err := json.Unmarshal([]byte(*response), &result); err != nil {
-		log.Print("Failed to unmarshall response from ListVolumes")
-		return element.ListVolumesResult{}, err
-	}
-
-	return result, nil
-}
-
 func resourceSolidFireVolumeUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Updating volume %#v", d)
 	client := meta.(*element.Client)
 
-	volume := ModifyVolumeRequest{}
+	volume := element.ModifyVolumeRequest{}
 
 	id := d.Id()
 	convID, convErr := strconv.Atoi(id)
@@ -294,20 +222,8 @@ func resourceSolidFireVolumeUpdate(d *schema.ResourceData, meta interface{}) err
 	if v, ok := d.GetOk("burst_iops"); ok {
 		volume.QOS.BurstIOPS = v.(int)
 	}
-	err := updateVolume(client, volume)
+	err := client.UpdateVolume(volume)
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func updateVolume(client *element.Client, request ModifyVolumeRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("ModifyVolume", params)
-	if err != nil {
-		log.Print("ModifyVolume request failed")
 		return err
 	}
 
@@ -318,7 +234,7 @@ func resourceSolidFireVolumeDelete(d *schema.ResourceData, meta interface{}) err
 	log.Printf("[DEBUG] Deleting volume: %#v", d)
 	client := meta.(*element.Client)
 
-	volume := DeleteVolumeRequest{}
+	volume := element.DeleteVolumeRequest{}
 
 	id := d.Id()
 	convID, convErr := strconv.Atoi(id)
@@ -328,43 +244,19 @@ func resourceSolidFireVolumeDelete(d *schema.ResourceData, meta interface{}) err
 	}
 	volume.VolumeID = convID
 
-	deleteErr := deleteVolume(client, volume)
+	deleteErr := client.DeleteVolume(volume)
 	if deleteErr != nil {
 		return deleteErr
 	}
 	// only purge the deleted volume if purge_on_delete is set to true
 	if v, ok := d.GetOk("purge_on_delete"); ok {
 		if v.(bool) {
-			purgeErr := purgeDeletedVolume(client, volume)
+			purgeErr := client.PurgeDeletedVolume(volume)
 			if purgeErr != nil {
 				return purgeErr
 			}
 		}
 	}
-	return nil
-}
-
-func deleteVolume(client *element.Client, request DeleteVolumeRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("DeleteVolume", params)
-	if err != nil {
-		log.Print("DeleteVolume request failed")
-		return err
-	}
-
-	return nil
-}
-
-func purgeDeletedVolume(client *element.Client, request DeleteVolumeRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("PurgeDeletedVolume", params)
-	if err != nil {
-		log.Print("PurgeDeletedVolume request failed")
-		return err
-	}
-
 	return nil
 }
 
@@ -385,7 +277,7 @@ func resourceSolidFireVolumeExists(d *schema.ResourceData, meta interface{}) (bo
 	s[0] = convID
 	volumes.Volumes = s
 
-	res, err := listVolumes(client, volumes)
+	res, err := client.ListVolumes(volumes)
 	if err != nil {
 		if err, ok := err.(*jsonrpc.ResponseError); ok {
 			if err.Name == "xUnknown" {
