@@ -5,36 +5,10 @@ import (
 	"log"
 	"strconv"
 
-	"encoding/json"
-
-	"github.com/fatih/structs"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sofixa/terraform-provider-solidfire/solidfire/element"
 	"github.com/sofixa/terraform-provider-solidfire/solidfire/element/jsonrpc"
 )
-
-type CreateAccountRequest struct {
-	Username        string      `structs:"username"`
-	InitiatorSecret string      `structs:"initiatorSecret,omitempty"`
-	TargetSecret    string      `structs:"targetSecret,omitempty"`
-	Attributes      interface{} `structs:"attributes,omitempty"`
-}
-
-type CreateAccountResult struct {
-	Account element.Account `json:"account"`
-}
-
-type ModifyAccountRequest struct {
-	AccountID       int         `structs:"accountID"`
-	InitiatorSecret string      `structs:"initiatorSecret,omitempty"`
-	TargetSecret    string      `structs:"targetSecret,omitempty"`
-	Attributes      interface{} `structs:"attributes,omitempty"`
-	Username        string      `structs:"username,omitempty"`
-}
-
-type RemoveAccountRequest struct {
-	AccountID int `structs:"accountID"`
-}
 
 func resourceSolidFireAccount() *schema.Resource {
 	return &schema.Resource{
@@ -77,7 +51,7 @@ func resourceSolidFireAccountCreate(d *schema.ResourceData, meta interface{}) er
 	log.Printf("[DEBUG] Creating account: %#v", d)
 	client := meta.(*element.Client)
 
-	acct := CreateAccountRequest{}
+	acct := element.CreateAccountRequest{}
 
 	if v, ok := d.GetOk("username"); ok {
 		acct.Username = v.(string)
@@ -93,7 +67,7 @@ func resourceSolidFireAccountCreate(d *schema.ResourceData, meta interface{}) er
 		acct.TargetSecret = v.(string)
 	}
 
-	resp, err := createAccount(client, acct)
+	resp, err := client.CreateAccount(acct)
 	if err != nil {
 		log.Print("Error creating account")
 		return err
@@ -104,25 +78,6 @@ func resourceSolidFireAccountCreate(d *schema.ResourceData, meta interface{}) er
 	log.Printf("[DEBUG] Created account: %v %v", acct.Username, resp.Account.AccountID)
 
 	return resourceSolidFireAccountRead(d, meta)
-}
-
-func createAccount(client *element.Client, request CreateAccountRequest) (CreateAccountResult, error) {
-	params := structs.Map(request)
-
-	log.Printf("[DEBUG] Parameters: %v", params)
-
-	response, err := client.CallAPIMethod("AddAccount", params)
-	if err != nil {
-		log.Print("CreateAccount request failed")
-		return CreateAccountResult{}, err
-	}
-
-	var result CreateAccountResult
-	if err := json.Unmarshal([]byte(*response), &result); err != nil {
-		log.Print("Failed to unmarshall response from CreateAccount")
-		return CreateAccountResult{}, err
-	}
-	return result, nil
 }
 
 func resourceSolidFireAccountRead(d *schema.ResourceData, meta interface{}) error {
@@ -152,7 +107,7 @@ func resourceSolidFireAccountUpdate(d *schema.ResourceData, meta interface{}) er
 	log.Printf("[DEBUG] Updating account %#v", d)
 	client := meta.(*element.Client)
 
-	acct := ModifyAccountRequest{}
+	acct := element.ModifyAccountRequest{}
 
 	id := d.Id()
 	convID, convErr := strconv.Atoi(id)
@@ -174,20 +129,8 @@ func resourceSolidFireAccountUpdate(d *schema.ResourceData, meta interface{}) er
 		acct.TargetSecret = v.(string)
 	}
 
-	err := modifyAccount(client, acct)
+	err := client.ModifyAccount(acct)
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func modifyAccount(client *element.Client, request ModifyAccountRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("ModifyAccount", params)
-	if err != nil {
-		log.Print("ModifyAccount request failed")
 		return err
 	}
 
@@ -198,7 +141,7 @@ func resourceSolidFireAccountDelete(d *schema.ResourceData, meta interface{}) er
 	log.Printf("[DEBUG] Deleting account: %#v", d)
 	client := meta.(*element.Client)
 
-	acct := RemoveAccountRequest{}
+	acct := element.RemoveAccountRequest{}
 
 	id := d.Id()
 	convID, convErr := strconv.Atoi(id)
@@ -208,20 +151,8 @@ func resourceSolidFireAccountDelete(d *schema.ResourceData, meta interface{}) er
 	}
 	acct.AccountID = convID
 
-	err := removeAccount(client, acct)
+	err := client.RemoveAccount(acct)
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func removeAccount(client *element.Client, request RemoveAccountRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("RemoveAccount", params)
-	if err != nil {
-		log.Print("DeleteAccount request failed")
 		return err
 	}
 
