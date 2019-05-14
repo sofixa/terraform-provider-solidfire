@@ -41,6 +41,7 @@ func TestVolumeAccessGroup_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "min_iops", "600"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "max_iops", "8000"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "burst_iops", "8000"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "purge_on_delete", "true"),
 					resource.TestCheckResourceAttr("solidfire_account.terraform-acceptance-test-1", "username", "terraform-acceptance-test-vag"),
 				),
 			},
@@ -78,6 +79,7 @@ func TestVolumeAccessGroup_update(t *testing.T) {
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "min_iops", "600"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "max_iops", "8000"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "burst_iops", "8000"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "purge_on_delete", "true"),
 					resource.TestCheckResourceAttr("solidfire_account.terraform-acceptance-test-1", "username", "terraform-acceptance-test-vag"),
 				),
 			},
@@ -110,12 +112,14 @@ func TestVolumeAccessGroup_update(t *testing.T) {
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "min_iops", "650"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "max_iops", "8500"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "burst_iops", "9500"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "purge_on_delete", "true"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-2", "name", "Terraform-Acceptance-Volume-2"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-2", "total_size", "1090519040"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-2", "enable512e", "true"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-2", "min_iops", "700"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-2", "max_iops", "8600"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-2", "burst_iops", "9600"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-2", "purge_on_delete", "true"),
 					resource.TestCheckResourceAttr("solidfire_account.terraform-acceptance-test-1", "username", "terraform-acceptance-test-vag"),
 				),
 			},
@@ -262,6 +266,7 @@ resource "solidfire_volume" "terraform-acceptance-test-1" {
 	min_iops = "%s"
 	max_iops = "%s"
 	burst_iops = "%s"
+	purge_on_delete = true
 }
 resource "solidfire_account" "terraform-acceptance-test-1" {
 	username = "terraform-acceptance-test-vag"
