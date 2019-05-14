@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sofixa/terraform-provider-solidfire/solidfire/element"
+	"log"
 	"strconv"
 	"testing"
 )
@@ -25,6 +26,7 @@ func TestVolume_basic(t *testing.T) {
 					"500",
 					"8000",
 					"10000",
+					"true",
 				),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSolidFireVolumeExists("solidfire_volume.terraform-acceptance-test-1", &volume),
@@ -37,7 +39,7 @@ func TestVolume_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "burst_iops", "10000"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "access", "readWrite"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "status", "active"),
-					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "purge_on_delete", "false"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "purge_on_delete", "true"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "volume_id"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "iqn"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "block_size"),
@@ -65,6 +67,7 @@ func TestVolume_update(t *testing.T) {
 					"500",
 					"8000",
 					"10000",
+					"false",
 				),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSolidFireVolumeExists("solidfire_volume.terraform-acceptance-test-1", &volume),
@@ -136,6 +139,7 @@ func testAccCheckSolidFireVolumeDestroy(s *terraform.State) error {
 					return fmt.Errorf("Volume %s still exists and status isn't deleted, it's %s", rs.Primary.ID, volume.Status)
 					// everything is working fine (volume was marked as deleted and will be by the SF), launch an explicit purge to make place for future tests
 				} else {
+					log.Printf("[DEBUG] Volume %s wasn't purged due to purge_on_delete=false, purging explicitly to clean up", rs.Primary.ID)
 					delVolume := element.DeleteVolumeRequest{}
 					convID, convErr := strconv.Atoi(rs.Primary.ID)
 
@@ -293,6 +297,7 @@ resource "solidfire_volume" "terraform-acceptance-test-1" {
 	min_iops = "%s"
 	max_iops = "%s"
 	burst_iops = "%s"
+	purge_on_delete = "%s"
 }
 resource "solidfire_account" "terraform-acceptance-test-1" {
 	username = "terraform-acceptance-test-volume"
