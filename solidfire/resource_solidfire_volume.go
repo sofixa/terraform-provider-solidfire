@@ -43,13 +43,7 @@ func resourceSolidFireVolume() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"attributes": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-			},
+			"attributes": schemaAttributes(),
 			"block_size": {
 				Type:     schema.TypeInt,
 				Computed: true,
@@ -141,6 +135,10 @@ func resourceSolidFireVolumeCreate(d *schema.ResourceData, meta interface{}) err
 		volume.QOS.BurstIOPS = v.(int)
 	}
 
+	if v, ok := d.GetOk("attributes"); ok {
+		volume.Attributes = v.(map[string]string)
+	}
+
 	resp, err := client.CreateVolume(volume)
 	if err != nil {
 		log.Print("Error creating volume")
@@ -222,6 +220,11 @@ func resourceSolidFireVolumeUpdate(d *schema.ResourceData, meta interface{}) err
 	if v, ok := d.GetOk("burst_iops"); ok {
 		volume.QOS.BurstIOPS = v.(int)
 	}
+
+	if v, ok := d.GetOk("attributes"); ok {
+		volume.Attributes = v.(map[string]string)
+	}
+
 	err := client.UpdateVolume(volume)
 	if err != nil {
 		return err
