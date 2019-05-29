@@ -30,12 +30,12 @@ type QualityOfService struct {
 }
 
 type CreateVolumeRequest struct {
-	Name       string           `structs:"name"`
-	AccountID  int              `structs:"accountID"`
-	TotalSize  int              `structs:"totalSize"`
-	Enable512E bool             `structs:"enable512e"`
-	Attributes interface{}      `structs:"attributes"`
-	QOS        QualityOfService `structs:"qos"`
+	Name       string            `structs:"name"`
+	AccountID  int               `structs:"accountID"`
+	TotalSize  int               `structs:"totalSize"`
+	Enable512E bool              `structs:"enable512e"`
+	Attributes map[string]string `structs:"attributes"`
+	QOS        QualityOfService  `structs:"qos"`
 }
 
 type CreateVolumeResult struct {
@@ -44,11 +44,11 @@ type CreateVolumeResult struct {
 }
 
 type ModifyVolumeRequest struct {
-	VolumeID   int              `structs:"volumeID"`
-	AccountID  int              `structs:"accountID"`
-	Attributes interface{}      `structs:"attributes"`
-	QOS        QualityOfService `structs:"qos"`
-	TotalSize  int              `structs:"totalSize"`
+	VolumeID   int               `structs:"volumeID"`
+	AccountID  int               `structs:"accountID"`
+	Attributes map[string]string `structs:"attributes"`
+	QOS        QualityOfService  `structs:"qos"`
+	TotalSize  int               `structs:"totalSize"`
 }
 
 type DeleteVolumeRequest struct {
@@ -56,21 +56,21 @@ type DeleteVolumeRequest struct {
 }
 
 type Volume struct {
-	Name               string           `json:"name"`
-	VolumeID           int              `json:"volumeID"`
-	Iqn                string           `json:"iqn"`
-	Access             string           `json:"access"`
-	AccountID          int              `json:"accountID"`
-	Attributes         interface{}      `structs:"attributes"`
-	BlockSize          int              `json:"blockSize"`
-	Enable512e         bool             `json:"enable512e"`
-	QOS                QualityOfService `structs:"qos"`
-	ScsiEUIDeviceID    string           `json:"scsiEUIDeviceID"`
-	ScsiNAADeviceID    string           `json:"ScsiNAADeviceID"`
-	Status             string           `json:"status"`
-	TotalSize          int              `structs:"totalSize"`
-	VirtualVolumeID    int              `json:"virtualVolumeID"`
-	VolumeAccessGroups []int            `json:"volumeAccessGroups"`
+	Name               string            `json:"name"`
+	VolumeID           int               `json:"volumeID"`
+	Iqn                string            `json:"iqn"`
+	Access             string            `json:"access"`
+	AccountID          int               `json:"accountID"`
+	Attributes         map[string]string `structs:"attributes"`
+	BlockSize          int               `json:"blockSize"`
+	Enable512e         bool              `json:"enable512e"`
+	QOS                QualityOfService  `structs:"qos"`
+	ScsiEUIDeviceID    string            `json:"scsiEUIDeviceID"`
+	ScsiNAADeviceID    string            `json:"ScsiNAADeviceID"`
+	Status             string            `json:"status"`
+	TotalSize          int               `structs:"totalSize"`
+	VirtualVolumeID    int               `json:"virtualVolumeID"`
+	VolumeAccessGroups []int             `json:"volumeAccessGroups"`
 }
 
 func (c *Client) GetVolumeByID(id string) (Volume, error) {

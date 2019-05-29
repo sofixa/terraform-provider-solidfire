@@ -40,6 +40,7 @@ func TestVolume_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "access", "readWrite"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "status", "active"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "purge_on_delete", "true"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "attributes.%", "1"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "volume_id"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "iqn"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "block_size"),
@@ -81,6 +82,7 @@ func TestVolume_update(t *testing.T) {
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "access", "readWrite"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "status", "active"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "purge_on_delete", "false"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "attributes.%", "1"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "volume_id"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "iqn"),
 					resource.TestCheckResourceAttrSet("solidfire_volume.terraform-acceptance-test-1", "block_size"),
@@ -109,6 +111,7 @@ func TestVolume_update(t *testing.T) {
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "min_iops", "650"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "max_iops", "8600"),
 					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "burst_iops", "9600"),
+					resource.TestCheckResourceAttr("solidfire_volume.terraform-acceptance-test-1", "attributes.%", "3"),
 				),
 			},
 		},
@@ -191,6 +194,14 @@ func testAccCheckSolidFireVolumeAttributes(volume *element.Volume) resource.Test
 		if volume.Status != "active" {
 			return fmt.Errorf("Volume is not active")
 		}
+		if len(volume.Attributes) != 1 {
+			return fmt.Errorf("Number of attributes is %d, was expecting %d", len(volume.Attributes), 1)
+		}
+		for k, v := range volume.Attributes {
+			if k != "test" || v != "test" {
+				return fmt.Errorf("Attributes key and value are %s and %s, was expecting %s and %s", k, v, "test", "test")
+			}
+		}
 
 		// Check volume's account_id and volume_access_group_id are correct
 		for _, rs := range s.RootModule().Resources {
@@ -237,6 +248,14 @@ func testAccCheckSolidFireVolumeAttributesUpdate(volume *element.Volume) resourc
 		}
 		if volume.Status != "active" {
 			return fmt.Errorf("Volume is not active")
+		}
+		if len(volume.Attributes) != 3 {
+			return fmt.Errorf("Number of attributes is %d, was expecting %d", len(volume.Attributes), 3)
+		}
+		for k, v := range volume.Attributes {
+			if k != v {
+				return fmt.Errorf("Attributes key and value are %s and %s, was expecting them to be equal", k, v)
+			}
 		}
 
 		// Check volume's account_id and volume_access_group_id are correct
@@ -298,6 +317,9 @@ resource "solidfire_volume" "terraform-acceptance-test-1" {
 	max_iops = "%s"
 	burst_iops = "%s"
 	purge_on_delete = "%s"
+	attributes = {
+		test = "test"
+	}
 }
 resource "solidfire_account" "terraform-acceptance-test-1" {
 	username = "terraform-acceptance-test-volume"
@@ -313,6 +335,11 @@ resource "solidfire_volume" "terraform-acceptance-test-1" {
 	max_iops = "%s"
 	burst_iops = "%s"
 	purge_on_delete = "%s"
+	attributes = {
+		test = "test"
+		test2 = "test2"
+		test3 = "test3"
+	}
 }
 
 resource "solidfire_account" "terraform-acceptance-test-1" {
