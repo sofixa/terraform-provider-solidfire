@@ -140,11 +140,7 @@ func resourceSolidFireVolumeCreate(d *schema.ResourceData, meta interface{}) err
 			volume.Attributes[key] = val.(string)
 		}
 	}
-
-	if v, ok := d.GetOk("attributes"); ok {
-		volume.Attributes = v.(map[string]string)
-	}
-
+  
 	resp, err := client.CreateVolume(volume)
 	if err != nil {
 		log.Print("Error creating volume")
