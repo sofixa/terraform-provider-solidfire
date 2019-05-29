@@ -195,10 +195,10 @@ func testAccCheckSolidFireVolumeAttributes(volume *element.Volume) resource.Test
 			return fmt.Errorf("Volume is not active")
 		}
 		if len(volume.Attributes) != 1 {
-			return fmt.Errorf("Number of attributes is %d, was expecting %d",len(volume.Attributes), 1)
+			return fmt.Errorf("Number of attributes is %d, was expecting %d", len(volume.Attributes), 1)
 		}
 		for k, v := range volume.Attributes {
-			if k != "test" || v != "test"{
+			if k != "test" || v != "test" {
 				return fmt.Errorf("Attributes key and value are %s and %s, was expecting %s and %s", k, v, "test", "test")
 			}
 		}
@@ -250,7 +250,7 @@ func testAccCheckSolidFireVolumeAttributesUpdate(volume *element.Volume) resourc
 			return fmt.Errorf("Volume is not active")
 		}
 		if len(volume.Attributes) != 3 {
-			return fmt.Errorf("Number of attributes is %d, was expecting %d",len(volume.Attributes), 3)
+			return fmt.Errorf("Number of attributes is %d, was expecting %d", len(volume.Attributes), 3)
 		}
 		for k, v := range volume.Attributes {
 			if k != v {
@@ -317,7 +317,7 @@ resource "solidfire_volume" "terraform-acceptance-test-1" {
 	max_iops = "%s"
 	burst_iops = "%s"
 	purge_on_delete = "%s"
-	attributes {
+	attributes = {
 		test = "test"
 	}
 }
@@ -335,7 +335,7 @@ resource "solidfire_volume" "terraform-acceptance-test-1" {
 	max_iops = "%s"
 	burst_iops = "%s"
 	purge_on_delete = "%s"
-	attributes {
+	attributes = {
 		test = "test"
 		test2 = "test2"
 		test3 = "test3"

@@ -30,12 +30,12 @@ type QualityOfService struct {
 }
 
 type CreateVolumeRequest struct {
-	Name       string           `structs:"name"`
-	AccountID  int              `structs:"accountID"`
-	TotalSize  int              `structs:"totalSize"`
-	Enable512E bool             `structs:"enable512e"`
-	Attributes interface{}      `structs:"attributes"`
-	QOS        QualityOfService `structs:"qos"`
+	Name       string            `structs:"name"`
+	AccountID  int               `structs:"accountID"`
+	TotalSize  int               `structs:"totalSize"`
+	Enable512E bool              `structs:"enable512e"`
+	Attributes map[string]string `structs:"attributes"`
+	QOS        QualityOfService  `structs:"qos"`
 }
 
 type CreateVolumeResult struct {
@@ -44,11 +44,11 @@ type CreateVolumeResult struct {
 }
 
 type ModifyVolumeRequest struct {
-	VolumeID   int              `structs:"volumeID"`
-	AccountID  int              `structs:"accountID"`
-	Attributes interface{}      `structs:"attributes"`
-	QOS        QualityOfService `structs:"qos"`
-	TotalSize  int              `structs:"totalSize"`
+	VolumeID   int               `structs:"volumeID"`
+	AccountID  int               `structs:"accountID"`
+	Attributes map[string]string `structs:"attributes"`
+	QOS        QualityOfService  `structs:"qos"`
+	TotalSize  int               `structs:"totalSize"`
 }
 
 type DeleteVolumeRequest struct {
