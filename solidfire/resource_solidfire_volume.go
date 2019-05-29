@@ -134,9 +134,11 @@ func resourceSolidFireVolumeCreate(d *schema.ResourceData, meta interface{}) err
 	if v, ok := d.GetOk("burst_iops"); ok {
 		volume.QOS.BurstIOPS = v.(int)
 	}
-
+	volume.Attributes = make(map[string]string)
 	if v, ok := d.GetOk("attributes"); ok {
-		volume.Attributes = v.(map[string]string)
+		for key, val := range v.(map[string]interface{}) {
+			volume.Attributes[key] = val.(string)
+		}
 	}
 
 	resp, err := client.CreateVolume(volume)
@@ -166,7 +168,12 @@ func resourceSolidFireVolumeRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("iqn", volume.Iqn)
 	d.Set("access", volume.Access)
 	d.Set("account_id", volume.AccountID)
+
 	d.Set("attributes", volume.Attributes)
+	for key, val := range volume.Attributes {
+		d.Set("attributes."+key, val)
+	}
+
 	d.Set("block_size", volume.BlockSize)
 	d.Set("enable512e", volume.Enable512e)
 	d.Set("min_iops", volume.QOS.MinIOPS)
@@ -221,8 +228,11 @@ func resourceSolidFireVolumeUpdate(d *schema.ResourceData, meta interface{}) err
 		volume.QOS.BurstIOPS = v.(int)
 	}
 
+	volume.Attributes = make(map[string]string)
 	if v, ok := d.GetOk("attributes"); ok {
-		volume.Attributes = v.(map[string]string)
+		for key, val := range v.(map[string]interface{}) {
+			volume.Attributes[key] = val.(string)
+		}
 	}
 
 	err := client.UpdateVolume(volume)

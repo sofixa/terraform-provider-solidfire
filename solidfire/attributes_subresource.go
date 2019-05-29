@@ -7,5 +7,6 @@ func schemaAttributes() *schema.Schema {
 		// Attributes subresource
 		Type:     schema.TypeMap,
 		Optional: true,
+		Elem:     &schema.Schema{Type: schema.TypeString},
 	}
 }
