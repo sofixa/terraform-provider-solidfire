@@ -43,7 +43,7 @@ func resourceSolidFireVolume() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"attributes": schemaAttributes(),
+			"attributes": schemaResourceAttributes(),
 			"block_size": {
 				Type:     schema.TypeInt,
 				Computed: true,
@@ -183,11 +183,10 @@ func resourceSolidFireVolumeRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("scsi_naa_device_id", volume.ScsiNAADeviceID)
 	d.Set("status", volume.Status)
 	d.Set("total_size", volume.TotalSize)
-	d.Set("virtual_volumeID", volume.VirtualVolumeID)
+	d.Set("virtual_volume_id", volume.VirtualVolumeID)
 
 	log.Printf("[DEBUG] %s: Read complete", volume.Name)
 	return nil
-
 }
 
 func resourceSolidFireVolumeUpdate(d *schema.ResourceData, meta interface{}) error {

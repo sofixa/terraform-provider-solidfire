@@ -40,6 +40,9 @@ func Provider() terraform.ResourceProvider {
 			"solidfire_volume":              resourceSolidFireVolume(),
 			"solidfire_account":             resourceSolidFireAccount(),
 		},
+		DataSourcesMap: map[string]*schema.Resource{
+			"solidfire_volume": dataSourceSolidFireVolume(),
+		},
 
 		ConfigureFunc: providerConfigure,
 	}
